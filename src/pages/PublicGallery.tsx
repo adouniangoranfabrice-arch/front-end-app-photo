@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../api/axios";
 import axios from "axios";
@@ -96,9 +96,10 @@ function triggerDownload(blob: Blob, filename: string) {
 function useColumnCount(): number {
   const getCount = () => {
     const w = window.innerWidth;
-    if (w >= 1280) return 4;
-    if (w >= 768) return 3;
-    return 2;
+    if (w >= 1536) return 5; // grands écrans
+    if (w >= 1024) return 4; // ordinateurs
+    if (w >= 640) return 3; // tablettes
+    return 2; // téléphones
   };
   const [count, setCount] = useState(getCount);
 
@@ -117,7 +118,7 @@ function useColumnCount(): number {
 
 function CalendarIcon() {
   return (
-    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-500/25 text-indigo-200">
+    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/25 text-indigo-200">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
         <rect x="3.5" y="5" width="17" height="15.5" rx="3" stroke="currentColor" strokeWidth="1.8" />
         <path d="M3.5 10h17" stroke="currentColor" strokeWidth="1.8" />
@@ -132,7 +133,7 @@ function CalendarIcon() {
 
 function PinIcon() {
   return (
-    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-500/25 text-rose-200">
+    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-500/25 text-rose-200">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
         <path
           d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0c0 5.4-6.5 11-6.5 11z"
@@ -193,6 +194,7 @@ export default function PublicGallery() {
   };
 
   const columnCount = useColumnCount();
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     if (!public_token) {
@@ -469,9 +471,9 @@ export default function PublicGallery() {
     return (
       <div
         key={photo.id}
-        className={`group relative overflow-hidden rounded-xl bg-neutral-900 transition ${
+        className={`group relative overflow-hidden rounded-lg bg-neutral-900 transition sm:rounded-xl ${
           mode === "grid" ? "aspect-square" : ""
-        } ${isSelected ? "ring-[3px] ring-indigo-500 ring-offset-2 ring-offset-neutral-950" : ""}`}
+        } ${isSelected ? "ring-[3px] ring-indigo-500 ring-offset-1 ring-offset-neutral-950 sm:ring-offset-2" : ""}`}
         style={mode === "mosaic" ? { aspectRatio: ratio } : undefined}
       >
         <button
@@ -503,7 +505,7 @@ export default function PublicGallery() {
         {selectMode ? (
           /* Case à cocher */
           <span
-            className={`pointer-events-none absolute left-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full border-2 shadow-md transition ${
+            className={`pointer-events-none absolute left-1.5 top-1.5 flex h-6 w-6 items-center sm:left-2.5 sm:top-2.5 sm:h-7 sm:w-7 justify-center rounded-full border-2 shadow-md transition ${
               isSelected
                 ? "border-indigo-500 bg-indigo-500 text-white"
                 : "border-white/90 bg-black/30 text-transparent backdrop-blur-sm"
@@ -515,7 +517,7 @@ export default function PublicGallery() {
             </svg>
           </span>
         ) : (
-          <span className="pointer-events-none absolute left-2.5 top-2.5 rounded-md bg-black/50 px-2 py-0.5 text-[11px] font-medium tabular-nums text-white/90 backdrop-blur-sm">
+          <span className="pointer-events-none absolute left-1.5 top-1.5 hidden rounded-md bg-black/50 px-1.5 py-0.5 text-[10px] min-[480px]:block sm:left-2.5 sm:top-2.5 sm:px-2 sm:text-[11px] font-medium tabular-nums text-white/90 backdrop-blur-sm">
             {index + 1}
           </span>
         )}
@@ -524,7 +526,7 @@ export default function PublicGallery() {
           <button
             type="button"
             onClick={() => void downloadOne(photo, index)}
-            className="absolute bottom-2.5 right-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-neutral-900 opacity-0 shadow-lg transition hover:bg-white focus:opacity-100 group-hover:opacity-100"
+            className="absolute bottom-1.5 right-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-neutral-900 opacity-0 shadow-lg transition hover:bg-white focus:opacity-100 group-hover:opacity-100 sm:bottom-2.5 sm:right-2.5 sm:h-9 sm:w-9 [@media(hover:none)]:opacity-90"
             aria-label={`Télécharger la photo ${index + 1}`}
             title="Télécharger"
           >
@@ -539,7 +541,7 @@ export default function PublicGallery() {
     <main className="min-h-screen bg-neutral-950 text-white">
       {/* En-tête */}
       <header className="border-b border-white/10">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl 2xl:max-w-[1600px] items-center justify-between px-3 py-4 sm:px-6 sm:py-5 lg:px-8">
           <a href="/" className="text-xl font-bold tracking-tight">
             Photiva<span className="text-indigo-400">.</span>
           </a>
@@ -550,8 +552,8 @@ export default function PublicGallery() {
       </header>
 
       {/* Couverture */}
-      <section className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 sm:pt-10 lg:px-8">
-        <div className="relative flex min-h-[280px] items-end overflow-hidden rounded-2xl bg-neutral-900 sm:min-h-[380px] md:rounded-3xl">
+      <section className="mx-auto max-w-7xl 2xl:max-w-[1600px] px-3 pt-4 sm:px-6 sm:pt-10 lg:px-8">
+        <div className="relative flex min-h-[240px] items-end overflow-hidden rounded-2xl bg-neutral-900 sm:min-h-[340px] md:rounded-3xl lg:min-h-[420px] [@media(max-height:500px)]:min-h-[200px]">
           {event.cover_photo && (
             <img
               src={event.cover_photo}
@@ -561,21 +563,21 @@ export default function PublicGallery() {
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/10" />
 
-          <div className="relative z-10 w-full p-6 sm:p-10 lg:p-12">
+          <div className="relative z-10 w-full p-5 sm:p-10 lg:p-12">
             {event.event_type && (
               <span className="inline-flex rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
                 {event.event_type}
               </span>
             )}
-            <h1 className="mt-4 max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+            <h1 className="mt-3 max-w-3xl break-words text-2xl font-bold tracking-tight sm:mt-4 sm:text-4xl md:text-5xl">
               {event.name}
             </h1>
             {event.description && (
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-neutral-200 sm:text-base">
+              <p className="mt-3 line-clamp-4 max-w-2xl text-sm leading-6 text-neutral-200 sm:line-clamp-none sm:text-base">
                 {event.description}
               </p>
             )}
-            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-neutral-300">
+            <div className="mt-4 flex flex-wrap gap-2 text-xs text-neutral-300 sm:mt-5 sm:gap-3 sm:text-sm">
               {event.event_date && (
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/30 py-1.5 pl-2 pr-3.5 backdrop-blur-sm">
                   <CalendarIcon />
@@ -583,9 +585,9 @@ export default function PublicGallery() {
                 </span>
               )}
               {event.location && (
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/30 py-1.5 pl-2 pr-3.5 backdrop-blur-sm">
+                <span className="inline-flex min-w-0 max-w-full items-center gap-2 rounded-full border border-white/15 bg-black/30 py-1.5 pl-2 pr-3.5 backdrop-blur-sm">
                   <PinIcon />
-                  {event.location}
+                  <span className="truncate">{event.location}</span>
                 </span>
               )}
             </div>
@@ -594,16 +596,16 @@ export default function PublicGallery() {
       </section>
 
       {/* Barre d'outils collante */}
-      <div className="sticky top-0 z-30 mt-8 border-y border-white/10 bg-neutral-950/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="sticky top-0 z-30 mt-5 sm:mt-8 border-y border-white/10 bg-neutral-950/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl 2xl:max-w-[1600px] flex-wrap items-center justify-between gap-x-3 gap-y-2 px-3 py-2.5 sm:px-6 sm:py-3 lg:px-8">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold tracking-tight">Les photos</h2>
+            <h2 className="text-base font-semibold tracking-tight sm:text-lg">Les photos</h2>
             <span className="rounded-full bg-white/5 px-3 py-1 text-xs tabular-nums text-neutral-300">
               {photos.length} photo{photos.length !== 1 ? "s" : ""}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
             {/* Choix de l'affichage */}
             <div
               className="flex rounded-xl border border-white/10 bg-white/5 p-1"
@@ -612,26 +614,32 @@ export default function PublicGallery() {
             >
               {(
                 [
-                  ["mosaic", "Mosaïque"],
-                  ["grid", "Grille"],
+                  ["mosaic", "Mosaïque", "M4 4h7v9H4zM13 4h7v5h-7zM13 11h7v9h-7zM4 15h7v5H4z"],
+                  ["grid", "Grille", "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"],
                 ] as const
-              ).map(([mode, label]) => (
+              ).map(([mode, label, icon]) => (
                 <button
                   key={mode}
                   type="button"
                   onClick={() => setView(mode)}
                   aria-pressed={view === mode}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+                  aria-label={label}
+                  title={label}
+                  className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition sm:px-3 ${
                     view === mode
                       ? "bg-white text-neutral-900"
                       : "text-neutral-400 hover:text-white"
                   }`}
                 >
-                  {label}
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+                    <path d={icon} stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                  </svg>
+                  <span className="hidden md:inline">{label}</span>
                 </button>
               ))}
             </div>
 
+            <div className="flex items-center gap-2">
             {/* Mode sélection */}
             {photos.length > 0 && (
               <button
@@ -639,7 +647,7 @@ export default function PublicGallery() {
                 onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
                 disabled={zipBusy}
                 aria-pressed={selectMode}
-                className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition disabled:opacity-50 ${
+                className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition disabled:opacity-50 sm:px-4 sm:py-2.5 ${
                   selectMode
                     ? "border-white bg-white text-neutral-900"
                     : "border-white/15 text-white hover:bg-white/10"
@@ -649,7 +657,14 @@ export default function PublicGallery() {
                   <rect x="3.5" y="3.5" width="17" height="17" rx="4" stroke="currentColor" strokeWidth="1.8" />
                   <path d="M8 12.5l2.8 2.8L16.5 9.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                {selectMode ? "Annuler" : "Sélectionner"}
+                {selectMode ? (
+                  "Annuler"
+                ) : (
+                  <>
+                    <span className="hidden min-[400px]:inline">Sélectionner</span>
+                    <span className="min-[400px]:hidden">Choisir</span>
+                  </>
+                )}
               </button>
             )}
 
@@ -659,7 +674,7 @@ export default function PublicGallery() {
                 type="button"
                 onClick={() => void downloadAll()}
                 disabled={zipBusy}
-                className="relative overflow-hidden rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-wait"
+                className="relative overflow-hidden rounded-xl bg-indigo-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-wait sm:px-4 sm:py-2.5"
               >
                 {zipBusy && (
                   <span
@@ -670,15 +685,17 @@ export default function PublicGallery() {
                 )}
                 <span className="relative flex items-center gap-2 tabular-nums">
                   <DownloadIcon />
-                  {zipLabel}
+                  <span className="hidden sm:inline">{zipLabel}</span>
+                  <span className="sm:hidden">{zipBusy ? `${zipPercent}%` : "Tout"}</span>
                 </span>
               </button>
             )}
+            </div>
           </div>
         </div>
 
         {zip.status === "error" && (
-          <p role="alert" className="mx-auto max-w-7xl px-4 pb-3 text-sm text-red-400 sm:px-6 lg:px-8">
+          <p role="alert" className="mx-auto max-w-7xl 2xl:max-w-[1600px] px-4 pb-3 text-sm text-red-400 sm:px-6 lg:px-8">
             {zip.message}{" "}
             <button
               type="button"
@@ -692,7 +709,7 @@ export default function PublicGallery() {
       </div>
 
       {/* Photos */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <section className="mx-auto max-w-7xl 2xl:max-w-[1600px] px-2 py-4 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         {photos.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/15 px-6 py-16 text-center">
             <div className="text-4xl">🖼️</div>
@@ -702,15 +719,15 @@ export default function PublicGallery() {
             </p>
           </div>
         ) : view === "mosaic" ? (
-          <div className="flex gap-3 sm:gap-4">
+          <div className="flex gap-2 sm:gap-3 lg:gap-4">
             {columns.map((col, c) => (
-              <div key={c} className="flex min-w-0 flex-1 flex-col gap-3 sm:gap-4">
+              <div key={c} className="flex min-w-0 flex-1 flex-col gap-2 sm:gap-3 lg:gap-4">
                 {col.map(({ photo, index }) => renderTile(photo, index, "mosaic"))}
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid grid-cols-3 gap-1 min-[480px]:gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-5 lg:gap-4 2xl:grid-cols-6">
             {photos.map((photo, index) => renderTile(photo, index, "grid"))}
           </div>
         )}
@@ -718,7 +735,7 @@ export default function PublicGallery() {
 
       <footer
         className={`border-t border-white/10 px-4 py-7 text-center text-sm text-neutral-500 ${
-          selectMode ? "pb-28" : ""
+          selectMode ? "pb-36 sm:pb-28" : ""
         }`}
       >
         Galerie partagée avec Photiva
@@ -726,13 +743,13 @@ export default function PublicGallery() {
 
       {/* Barre flottante de la sélection */}
       {selectMode && (
-        <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 sm:pb-6">
-          <div className="mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-neutral-900/95 px-4 py-3 shadow-2xl backdrop-blur-md">
-            <div className="flex items-center gap-3">
+        <div className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-4 sm:pb-6">
+          <div className="mx-auto flex max-w-2xl items-center justify-between gap-2 rounded-2xl border border-white/10 bg-neutral-900/95 px-3 py-2.5 shadow-2xl backdrop-blur-md sm:gap-3 sm:px-4 sm:py-3">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
               <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-indigo-600 px-2 text-sm font-bold tabular-nums">
                 {selectedIds.size}
               </span>
-              <span className="text-sm text-neutral-300">
+              <span className="hidden text-sm text-neutral-300 min-[420px]:inline">
                 photo{selectedIds.size > 1 ? "s" : ""} sélectionnée
                 {selectedIds.size > 1 ? "s" : ""}
               </span>
@@ -746,7 +763,7 @@ export default function PublicGallery() {
                   )
                 }
                 disabled={zipBusy}
-                className="text-sm font-medium text-indigo-300 underline-offset-4 hover:underline disabled:opacity-50"
+                className="text-xs font-medium text-indigo-300 underline-offset-4 hover:underline disabled:opacity-50 sm:text-sm"
               >
                 {selectedIds.size === photos.length ? "Tout désélectionner" : "Tout sélectionner"}
               </button>
@@ -756,7 +773,7 @@ export default function PublicGallery() {
               type="button"
               onClick={() => void downloadSelection()}
               disabled={selectedIds.size === 0 || zipBusy}
-              className="relative overflow-hidden rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+              className="relative shrink-0 overflow-hidden rounded-xl bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
             >
               {zipBusy && (
                 <span
@@ -767,9 +784,14 @@ export default function PublicGallery() {
               )}
               <span className="relative flex items-center gap-2 tabular-nums">
                 <DownloadIcon />
-                {zipBusy
-                  ? zipLabel
-                  : `Télécharger${selectedIds.size > 0 ? ` (${selectedIds.size})` : ""}`}
+                {zipBusy ? (
+                  `${zipPercent}%`
+                ) : (
+                  <>
+                    <span className="hidden min-[420px]:inline">Télécharger</span>
+                    {selectedIds.size > 0 && <span>({selectedIds.size})</span>}
+                  </>
+                )}
               </span>
             </button>
           </div>
@@ -779,7 +801,7 @@ export default function PublicGallery() {
       {/* Visionneuse plein écran */}
       {selectedPhoto && selectedIndex !== null && (
         <div
-          className="fixed inset-0 z-50 flex flex-col bg-black/95"
+          className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-black/95 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]"
           role="dialog"
           aria-modal="true"
           aria-label="Aperçu de la photo"
@@ -787,7 +809,7 @@ export default function PublicGallery() {
         >
           {/* Barre du haut */}
           <div
-            className="flex items-center justify-between px-4 py-3 text-sm text-neutral-300"
+            className="flex shrink-0 items-center justify-between px-3 py-2 text-sm text-neutral-300 sm:px-4 sm:py-3"
             onClick={(e) => e.stopPropagation()}
           >
             <span className="tabular-nums">
@@ -797,9 +819,11 @@ export default function PublicGallery() {
               <button
                 type="button"
                 onClick={() => void downloadOne(selectedPhoto, selectedIndex)}
-                className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-200"
+                className="flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-200 sm:px-4"
+                aria-label="Télécharger la photo"
               >
-                ↓ Télécharger
+                <DownloadIcon />
+                <span className="hidden sm:inline">Télécharger</span>
               </button>
               <button
                 type="button"
@@ -813,7 +837,22 @@ export default function PublicGallery() {
           </div>
 
           {/* Image + flèches */}
-          <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-4 sm:px-16">
+          <div
+            className="relative flex min-h-0 flex-1 touch-pan-y items-center justify-center px-1 pb-2 sm:px-16 sm:pb-4"
+            onTouchStart={(e) => {
+              touchStartX.current = e.touches[0].clientX;
+            }}
+            onTouchEnd={(e) => {
+              if (touchStartX.current === null) return;
+              const dx = e.changedTouches[0].clientX - touchStartX.current;
+              touchStartX.current = null;
+              // Balayage horizontal pour changer de photo
+              if (Math.abs(dx) > 50) {
+                if (dx > 0) showPrev();
+                else showNext();
+              }
+            }}
+          >
             {photos.length > 1 && (
               <button
                 type="button"
@@ -821,7 +860,7 @@ export default function PublicGallery() {
                   e.stopPropagation();
                   showPrev();
                 }}
-                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white transition hover:bg-white/25 sm:left-4"
+                className="absolute left-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white/10 p-3 text-white transition hover:bg-white/25 sm:left-4 sm:block"
                 aria-label="Photo précédente"
               >
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
@@ -834,7 +873,8 @@ export default function PublicGallery() {
               key={selectedPhoto.id}
               src={selectedPhoto.file_url || selectedPhoto.thumbnail_url!}
               alt={selectedPhoto.original_name || "Photo agrandie"}
-              className="max-h-full max-w-full rounded-lg object-contain"
+              className="max-h-full max-w-full select-none rounded-md object-contain sm:rounded-lg"
+              draggable={false}
               onClick={(e) => e.stopPropagation()}
             />
 
@@ -845,7 +885,7 @@ export default function PublicGallery() {
                   e.stopPropagation();
                   showNext();
                 }}
-                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white transition hover:bg-white/25 sm:right-4"
+                className="absolute right-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white/10 p-3 text-white transition hover:bg-white/25 sm:right-4 sm:block"
                 aria-label="Photo suivante"
               >
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
@@ -858,7 +898,7 @@ export default function PublicGallery() {
           {/* Bande de miniatures */}
           {photos.length > 1 && (
             <div
-              className="flex gap-2 overflow-x-auto px-4 pb-4"
+              className="flex shrink-0 gap-1.5 overflow-x-auto px-3 pb-3 sm:gap-2 sm:px-4 sm:pb-4 [@media(max-height:500px)]:hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {photos.map((p, i) => (
@@ -869,7 +909,7 @@ export default function PublicGallery() {
                   ref={(el) => {
                     if (i === selectedIndex) el?.scrollIntoView({ block: "nearest", inline: "center" });
                   }}
-                  className={`h-14 w-14 shrink-0 overflow-hidden rounded-md transition ${
+                  className={`h-11 w-11 shrink-0 overflow-hidden rounded-md transition sm:h-14 sm:w-14 ${
                     i === selectedIndex
                       ? "ring-2 ring-white"
                       : "opacity-50 hover:opacity-100"
