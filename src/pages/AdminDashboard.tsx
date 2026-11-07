@@ -145,18 +145,6 @@ const USERS: User[] = [
   { id: '8', name: 'Olivier Framed', email: 'olivier@mail.com', plan: 'Pro', events: 9, photos: 4200, joinedDate: '02 Mai 2026', status: 'actif', avatar: 'OF' },
 ]
 
-const planStyles: Record<UserPlan, string> = {
-  Gratuit: 'bg-ink-700/40 text-ink-300 border-ink-600/40',
-  Pro: 'bg-gold-500/10 bg-indigo-600 border-gold-500/20',
-  Studio: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-}
-
-const statusStyles: Record<UserStatus, string> = {
-  actif: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  suspendu: 'bg-red-500/10 text-red-400 border-red-500/20',
-  'en attente': 'bg-gold-500/10 bg-indigo-600 border-gold-500/20',
-}
-
 interface AdminEvent {
   name: string
   photographer: string
@@ -181,27 +169,11 @@ const eventStatusStyles: Record<string, string> = {
   ink: 'bg-ink-700/40 text-ink-400 border-ink-600/40',
 }
 
-const RECENT_ACTIVITY = [
-  { user: 'Kouassi Photo', action: 'a créé l\'événement', target: 'Mariage Kouassi & Grâce', time: 'Il y a 2 h', avatar: 'KP' },
-  { user: 'Grâce Studio', action: 'a importé 680 photos', target: 'Concert Fête de la Musique', time: 'Il y a 5 h', avatar: 'GS' },
-  { user: 'Aya Photography', action: 's\'est inscrite', target: 'Plan Pro', time: 'Il y a 1 j', avatar: 'AP' },
-  { user: 'Nadège Capture', action: 'a terminé le traitement de', target: 'Gala CCI Abidjan', time: 'Il y a 2 j', avatar: 'NC' },
-  { user: 'Marc Lens', action: 'a mis à niveau vers', target: 'Plan Gratuit', time: 'Il y a 3 j', avatar: 'ML' },
-]
-
 export default function AdminDashboard() {
   const [activeView, setActiveView] = useState<View>('overview')
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [userSearch, setUserSearch] = useState('')
-  const [userFilter, setUserFilter] = useState<'all' | UserStatus>('all')
   const [eventSearch, setEventSearch] = useState('')
   const logout = useLogout();
-
-  const filteredUsers = USERS.filter((u) => {
-    if (userFilter !== 'all' && u.status !== userFilter) return false
-    if (userSearch && !u.name.toLowerCase().includes(userSearch.toLowerCase()) && !u.email.toLowerCase().includes(userSearch.toLowerCase())) return false
-    return true
-  })
 
   const filteredEvents = ADMIN_EVENTS.filter(
     (e) => !eventSearch || e.name.toLowerCase().includes(eventSearch.toLowerCase()) || e.photographer.toLowerCase().includes(eventSearch.toLowerCase()),

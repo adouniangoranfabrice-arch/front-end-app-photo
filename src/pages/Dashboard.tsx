@@ -79,77 +79,20 @@ const STATS = [
   ) },
 ]
 
-const EVENTS = [
-  {
-    name: 'Mariage Kouassi & Grâce',
-    date: '15 Sept. 2026',
-    photos: 420,
-    status: 'Terminé',
-    cover: 'https://images.pexels.com/photos/30049861/pexels-photo-30049861.jpeg?auto=compress&cs=tinysrgb&w=400',
-    statusColor: 'emerald',
-    progress: 100,
-  },
-  {
-    name: 'Baptême Baby Aya',
-    date: '22 Sept. 2026',
-    photos: 180,
-    status: 'Traitement',
-    cover: 'https://images.pexels.com/photos/16537217/pexels-photo-16537217.png?auto=compress&cs=tinysrgb&w=400',
-    statusColor: 'gold',
-    progress: 65,
-  },
-  {
-    name: 'Conférence TechAbidjan',
-    date: '28 Sept. 2026',
-    photos: 0,
-    status: 'En attente',
-    cover: 'https://images.pexels.com/photos/9275222/pexels-photo-9275222.jpeg?auto=compress&cs=tinysrgb&w=400',
-    statusColor: 'ink',
-    progress: 0,
-  },
-  {
-    name: 'Concert Fête de la Musique',
-    date: '01 Oct. 2026',
-    photos: 680,
-    status: 'Traitement',
-    cover: 'https://images.pexels.com/photos/4218027/pexels-photo-4218027.jpeg?auto=compress&cs=tinysrgb&w=400',
-    statusColor: 'gold',
-    progress: 80,
-  },
-]
-
-const statusStyles: Record<string, string> = {
-  emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  gold: 'bg-gold-500/10 bg-indigo-600 border-gold-500/20',
-  ink: 'bg-ink-700/40 text-ink-400 border-ink-600/40',
-}
-
 export default function Dashboard() {
   const [activeItem, setActiveItem] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [view, setView] = useState<'dashboard' | 'photos'>('dashboard')
-  const [extraEvents, setExtraEvents] = useState<CreatedEvent[]>([])
   const [eventsRefreshKey, setEventsRefreshKey] = useState(0)
   const logout = useLogout();
 
-  const handleEventCreated = (event: CreatedEvent) => {
-    setExtraEvents((prev) => [event, ...prev])
+  const handleEventCreated = (_event: CreatedEvent) => {
     setEventsRefreshKey((k) => k + 1)
     setShowCreateModal(false)
     setView('photos')
     setActiveItem('photos')
   }
-
-  const allEvents = [...extraEvents.map((e) => ({
-    name: e.name,
-    date: e.date || 'Date à définir',
-    photos: 0,
-    status: 'En attente',
-    cover: e.coverUrl || 'https://images.pexels.com/photos/9275222/pexels-photo-9275222.jpeg?auto=compress&cs=tinysrgb&w=400',
-    statusColor: 'ink',
-    progress: 0,
-  })), ...EVENTS]
 
   const handleSidebarClick = (id: string) => {
     setActiveItem(id)
