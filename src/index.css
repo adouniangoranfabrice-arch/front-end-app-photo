@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Dark mode (default) ===== */
+:root,
+.dark {
+  --ink-50: 248 248 247;
+  --ink-100: 240 240 238;
+  --ink-200: 226 226 222;
+  --ink-300: 200 200 195;
+  --ink-400: 154 154 147;
+  --ink-500: 107 107 99;
+  --ink-600: 74 74 67;
+  --ink-700: 51 51 46;
+  --ink-800: 34 34 32;
+  --ink-900: 22 22 20;
+  --ink-950: 12 12 10;
+  --overlay: 255 255 255;
+}
+
+/* ===== Light mode ===== */
+.light {
+  --ink-50: 12 12 10;
+  --ink-100: 22 22 20;
+  --ink-200: 34 34 32;
+  --ink-300: 51 51 46;
+  --ink-400: 74 74 67;
+  --ink-500: 107 107 99;
+  --ink-600: 154 154 147;
+  --ink-700: 200 200 195;
+  --ink-800: 226 226 222;
+  --ink-900: 240 240 238;
+  --ink-950: 248 248 247;
+  --overlay: 0 0 0;
+}
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-ink-950 text-ink-100 font-body antialiased;
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  h1, h2, h3, h4, h5 {
+    @apply font-display font-bold leading-tight tracking-tight;
+  }
+
+  a {
+    @apply text-inherit no-underline;
+  }
+
+  img {
+    @apply block max-w-full;
+  }
+
+  button {
+    @apply font-body cursor-pointer border-none bg-transparent;
+  }
+
+  ::selection {
+    @apply bg-gold-500 text-ink-950;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-ink-950;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ink-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-600;
+  }
+}
+
+@layer components {
+  .reveal {
+    @apply opacity-0 translate-y-8 transition-all duration-700 ease-out;
+  }
+  .reveal.visible {
+    @apply opacity-100 translate-y-0;
+  }
+
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-gold-300 via-gold-400 to-gold-500 bg-clip-text text-transparent;
+  }
+
+  .glass {
+    @apply bg-ink-900/70 backdrop-blur-xl border border-overlay/[0.06];
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1.5 hover:border-gold-500/30 hover:shadow-2xl hover:shadow-gold-500/5;
+  }
+}
