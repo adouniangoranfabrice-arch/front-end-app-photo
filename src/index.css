@@ -72,7 +72,7 @@
   }
 
   ::selection {
-    @apply bg-gold-500 text-ink-950;
+    @apply bg-brand-500 text-white;
   }
 
   ::-webkit-scrollbar {
@@ -97,8 +97,8 @@
     @apply opacity-100 translate-y-0;
   }
 
-  .text-gradient-gold {
-    @apply bg-gradient-to-r from-gold-300 via-gold-400 to-gold-500 bg-clip-text text-transparent;
+  .text-gradient-brand {
+    @apply bg-gradient-to-r from-brand-300 via-brand-400 to-brand-500 bg-clip-text text-transparent;
   }
 
   .glass {
@@ -106,6 +106,75 @@
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:-translate-y-1.5 hover:border-gold-500/30 hover:shadow-2xl hover:shadow-gold-500/5;
+    @apply transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-500/30 hover:shadow-2xl hover:shadow-brand-500/5;
+  }
+
+  /* ===== Design system Photiva ===== */
+  .card {
+    @apply rounded-2xl border border-overlay/[0.06] bg-ink-900/60;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 8px 24px -12px rgba(0, 0, 0, 0.35);
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
+      transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50
+      focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-gradient-to-r from-brand-400 to-brand-600 text-white
+      hover:-translate-y-0.5 hover:brightness-110 disabled:hover:translate-y-0;
+    box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.45);
+  }
+  .btn-secondary {
+    @apply btn border border-brand-500/25 bg-brand-500/[0.06] text-brand-400 hover:border-brand-500/40 hover:bg-brand-500/10;
+  }
+  .btn-ghost {
+    @apply btn border border-overlay/[0.1] text-ink-200 hover:bg-overlay/[0.05] hover:text-ink-50;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-500;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-overlay/[0.1] bg-ink-950/60 px-4 py-2.5 text-sm text-ink-50
+      placeholder:text-ink-500 outline-none transition
+      focus:border-brand-500/70 focus:ring-4 focus:ring-brand-500/10;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink-200;
+  }
+
+  .alert-success {
+    @apply rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400;
+  }
+  .alert-error {
+    @apply rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-red-400;
+  }
+
+  /* Intitulé de section éditorial : un trait + petites capitales */
+  .kicker {
+    @apply inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-400;
+  }
+  .kicker::before {
+    content: '';
+    @apply block h-px w-8 bg-brand-500/60;
+  }
+
+  .section {
+    @apply py-20 md:py-28;
+  }
+  .container-page {
+    @apply mx-auto max-w-content px-5 sm:px-6;
+  }
+  .h-section {
+    @apply font-display text-[2rem] font-bold leading-[1.08] tracking-tight text-ink-50 sm:text-4xl md:text-5xl;
+  }
+  .lead {
+    @apply text-base leading-relaxed text-ink-300 md:text-lg;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full border border-brand-500/20 bg-brand-500/[0.08]
+      px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-brand-400;
   }
 }

@@ -231,8 +231,8 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
                 onClick={() => fileInputRef.current?.click()}
                 className={`relative h-36 rounded-2xl border-2 border-dashed cursor-pointer transition-all flex items-center justify-center overflow-hidden ${
                   dragging
-                    ? 'border-gold-500 bg-gold-500/5'
-                    : 'border-overlay/15 hover:border-gold-500/40 hover:bg-overlay/[0.02]'
+                    ? 'border-brand-500 bg-brand-500/5'
+                    : 'border-overlay/15 hover:border-brand-500/40 hover:bg-overlay/[0.02]'
                 }`}
               >
                 {coverUrl ? (
@@ -272,7 +272,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Mariage Kouassi & Grâce"
                 required
-                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
               />
             </div>
 
@@ -283,7 +283,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
                 value={eventType}
                 onChange={(e) => setEventType(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
               >
                 <option value="" disabled>
                   Choisir un type
@@ -304,7 +304,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Décrivez votre événement..."
                 rows={2}
-                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10 resize-none"
+                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10 resize-none"
               />
             </div>
 
@@ -317,7 +317,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                  className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
                 />
               </div>
               <div>
@@ -327,7 +327,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                  className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
                 />
               </div>
             </div>
@@ -341,7 +341,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Hôtel Ivoire, Abidjan"
                 required
-                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
               />
             </div>
 
@@ -351,7 +351,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
                 type="checkbox"
                 checked={isPublic}
                 onChange={(e) => setIsPublic(e.target.checked)}
-                className="w-4 h-4 accent-gold-500"
+                className="w-4 h-4 accent-brand-500"
               />
               Galerie publique (accessible via le lien)
             </label>
@@ -366,7 +366,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 rounded-xl bg-gradient-to-r from-gold-400 to-gold-600 text-ink-950 font-semibold shadow-lg shadow-gold-500/25 transition-all hover:-translate-y-0.5 hover:shadow-gold-500/40"
+              className="w-full py-3.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 rounded-xl bg-gradient-to-r from-brand-400 to-brand-600 text-white font-semibold shadow-lg shadow-brand-500/25 transition-all hover:-translate-y-0.5 hover:shadow-brand-500/40"
             >
               {submitting ? 'Création en cours…' : "Créer l'événement"}
             </button>
@@ -387,7 +387,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
 
             {/* QR Code */}
             <div className="relative w-44 h-44 flex items-center justify-center rounded-2xl bg-ink-950 border border-overlay/[0.08] p-3 mb-6">
-              <div className="absolute -inset-3 rounded-2xl bg-gold-500/[0.1] blur-xl animate-pulse-glow" />
+              <div className="absolute -inset-3 rounded-2xl bg-brand-500/[0.1] blur-xl animate-pulse-glow" />
               <QRCode size={160} />
             </div>
 
@@ -400,7 +400,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
                 </div>
                 <button
                   onClick={copyUrl}
-                  className="px-4 py-3 rounded-xl bg-gold-500/10 border border-gold-500/20 bg-indigo-600 text-sm font-semibold transition-all hover:bg-gold-500/20 shrink-0"
+                  className="px-4 py-3 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400 text-sm font-semibold transition-all hover:bg-brand-500/20 shrink-0"
                 >
                   {copied ? 'Copié !' : 'Copier'}
                 </button>
@@ -411,7 +411,7 @@ export default function CreateEventModal({ onClose, onCreated }: CreateEventModa
             <div className="w-full flex flex-col gap-3">
               <button
                 onClick={handleConfirm}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-gold-400 to-gold-600 text-ink-950 font-semibold shadow-lg shadow-gold-500/25 transition-all hover:-translate-y-0.5"
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-400 to-brand-600 text-white font-semibold shadow-lg shadow-brand-500/25 transition-all hover:-translate-y-0.5"
               >
                 Gérer les photos →
               </button>

@@ -1,91 +1,85 @@
-const HERO_BG =
-  'https://images.pexels.com/photos/30049861/pexels-photo-30049861.jpeg?auto=compress&cs=tinysrgb&w=1600'
-const FLOAT_1 =
-  'https://images.pexels.com/photos/29997401/pexels-photo-29997401.jpeg?auto=compress&cs=tinysrgb&w=400'
-const FLOAT_2 =
-  'https://images.pexels.com/photos/32957317/pexels-photo-32957317.jpeg?auto=compress&cs=tinysrgb&w=400'
-const FLOAT_3 =
-  'https://images.pexels.com/photos/30049860/pexels-photo-30049860.jpeg?auto=compress&cs=tinysrgb&w=400'
-
 import { Link } from 'react-router-dom'
+
+const MAIN_PHOTO =
+  'https://images.pexels.com/photos/30049861/pexels-photo-30049861.jpeg?auto=compress&cs=tinysrgb&w=1100'
+const SECOND_PHOTO =
+  'https://images.pexels.com/photos/29997401/pexels-photo-29997401.jpeg?auto=compress&cs=tinysrgb&w=500'
+const SELFIE =
+  'https://images.pexels.com/photos/7243117/pexels-photo-7243117.jpeg?auto=compress&cs=tinysrgb&w=160'
 
 export default function Hero() {
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      {/* Background */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src={HERO_BG}
-          alt="Cérémonie de mariage en Côte d'Ivoire"
-          className="w-full h-full object-cover scale-105 animate-fade-in"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink-950/40 via-ink-950/60 to-ink-950/90" />
-      </div>
+    <section id="hero" className="relative overflow-hidden pt-28 pb-20 md:pt-36 md:pb-28">
+      {/* Lumière chaude discrète, comme un projecteur hors champ */}
+      <div className="pointer-events-none absolute -right-40 -top-40 h-[620px] w-[620px] rounded-full bg-brand-500/[0.09] blur-3xl" />
 
-      {/* Floating photos */}
-      <div className="absolute inset-0 z-[1] pointer-events-none hidden md:block">
-        <div className="absolute top-[18%] left-[5%] w-40 h-52 rounded-2xl overflow-hidden border-2 border-overlay/15 shadow-2xl animate-float opacity-0 animate-fade-in" style={{ animationDelay: '0.5s, 0.5s' }}>
-          <img src={FLOAT_1} alt="Mariage" className="w-full h-full object-cover" />
-        </div>
-        <div className="absolute bottom-[15%] left-[10%] w-36 h-44 rounded-2xl overflow-hidden border-2 border-overlay/15 shadow-2xl animate-float-delay opacity-0 animate-fade-in" style={{ animationDelay: '0.8s, 0.8s' }}>
-          <img src={FLOAT_2} alt="Photographe" className="w-full h-full object-cover" />
-        </div>
-        <div className="absolute top-[22%] right-[6%] w-36 h-48 rounded-2xl overflow-hidden border-2 border-overlay/15 shadow-2xl animate-float opacity-0 animate-fade-in" style={{ animationDelay: '1.1s, 1.1s' }}>
-          <img src={FLOAT_3} alt="Célébration" className="w-full h-full object-cover" />
-        </div>
-      </div>
+      <div className="container-page relative grid items-center gap-14 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
+        {/* Texte */}
+        <div className="opacity-0 animate-fade-up">
+          <p className="kicker mb-7">Pour les photographes d'événements</p>
 
-      {/* Content */}
-      <div className="relative z-[2] text-center max-w-3xl mx-auto px-6">
-        <span className="inline-flex items-center gap-2 px-4 py-2 mb-7 text-xs font-semibold uppercase tracking-wider text-gold-300 bg-gold-500/10 border border-gold-500/20 rounded-full opacity-0 animate-fade-up" style={{ animationDelay: '0.1s' }}>
-          <span className="w-2 h-2 rounded-full bg-gold-400 shadow-[0_0_8px_#fbbf24] animate-pulse-glow" />
-          La photographie événementielle, réinventée
-        </span>
+          <h1 className="font-display text-[2.6rem] font-bold leading-[1.03] tracking-tight text-ink-50 sm:text-6xl lg:text-[4.1rem]">
+            Chaque invité repart avec <em className="font-medium italic text-brand-400">ses</em> photos.
+          </h1>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6 opacity-0 animate-fade-up" style={{ animationDelay: '0.25s' }}>
-          Retrouvez <span className="text-gradient-gold italic">vos photos</span> d'événement en quelques secondes.
-        </h1>
+          <p className="lead mt-7 max-w-xl">
+            Vous livrez 1 200 photos d'un mariage. Photiva les présente dans une galerie soignée, et
+            chaque invité retrouve les siennes avec un simple selfie. Fini les dossiers WhatsApp à trier
+            et les «&nbsp;tu peux m'envoyer celles où je suis&nbsp;?&nbsp;».
+          </p>
 
-        <p className="text-base md:text-lg text-ink-300 max-w-xl mx-auto mb-9 leading-relaxed opacity-0 animate-fade-up" style={{ animationDelay: '0.4s' }}>
-          Une plateforme pensée pour les photographes et les événements en Côte d'Ivoire. Importez vos
-          photos, partagez un simple lien ou QR Code et laissez vos invités retrouver facilement leurs
-          photos grâce à leur selfie.
-        </p>
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link to="/signup" className="btn-primary rounded-full px-7 py-3.5 text-[15px]">
+              Créer mon espace gratuitement
+            </Link>
+            <a
+              href="#how-it-works"
+              className="group inline-flex items-center justify-center gap-2 px-4 py-3.5 text-[15px] font-semibold text-ink-200 transition-colors hover:text-ink-50"
+            >
+              Voir comment ça marche
+              <span className="transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+            </a>
+          </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-5 opacity-0 animate-fade-up" style={{ animationDelay: '0.55s' }}>
-          <Link
-            to="/signup"
-            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-gold-400 to-gold-600 text-ink-950 font-semibold shadow-xl shadow-gold-500/30 transition-all hover:-translate-y-0.5 hover:shadow-gold-500/45"
-          >
-            Créer mon espace photographe →
-          </Link>
-          <a
-            href="#how-it-works"
-            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-overlay/[0.06] border border-overlay/10 text-ink-100 font-semibold backdrop-blur-md transition-all hover:bg-overlay/[0.12] hover:border-overlay/20 hover:-translate-y-0.5"
-          >
-            Découvrir comment ça marche
-          </a>
+          <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-overlay/[0.08] pt-6 text-sm text-ink-400">
+            <li>Aucune application à installer</li>
+            <li>Aucun compte pour les invités</li>
+            <li>Pensé pour le mobile</li>
+          </ul>
         </div>
 
-        <p className="flex items-center justify-center gap-2 text-sm text-ink-400 opacity-0 animate-fade-up" style={{ animationDelay: '0.7s' }}>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
-            <path
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+        {/* Composition photo */}
+        <div className="relative mx-auto w-full max-w-[520px] opacity-0 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <figure className="relative ml-auto w-[86%] overflow-hidden rounded-[28px] shadow-2xl shadow-black/40">
+            <img
+              src={MAIN_PHOTO}
+              alt="Mariés lors de leur cérémonie"
+              className="aspect-[4/5] w-full object-cover"
             />
-          </svg>
-          Aucune inscription nécessaire pour les invités.
-        </p>
-      </div>
+            <figcaption className="absolute bottom-4 right-4 rounded-full bg-black/45 px-3 py-1 text-[11px] font-medium text-white/85 backdrop-blur">
+              Mariage · Grand-Bassam
+            </figcaption>
+          </figure>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-[2] opacity-0 animate-fade-in" style={{ animationDelay: '1.2s' }}>
-        <span className="text-xs uppercase tracking-widest text-ink-500">Défiler</span>
-        <div className="w-px h-10 bg-gradient-to-b from-ink-500 to-transparent relative overflow-hidden">
-          <div className="absolute top-0 w-px h-10 bg-gold-400 animate-scroll-down" />
+          <img
+            src={SECOND_PHOTO}
+            alt=""
+            className="absolute -bottom-8 left-0 hidden aspect-square w-[42%] rounded-[22px] border-[6px] border-ink-950 object-cover shadow-2xl sm:block"
+          />
+
+          {/* Carte d'interface : le résultat d'un selfie */}
+          <div className="absolute -left-2 top-10 w-60 rounded-2xl border border-white/10 bg-[#141412]/90 p-3.5 text-white shadow-2xl backdrop-blur-xl sm:-left-8">
+            <div className="flex items-center gap-3">
+              <img src={SELFIE} alt="" className="h-11 w-11 rounded-full object-cover ring-2 ring-brand-400" />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold">C'est bien vous&nbsp;!</p>
+                <p className="text-xs text-white/60">27 photos trouvées sur 1 184</p>
+              </div>
+            </div>
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full w-full rounded-full bg-gradient-to-r from-brand-300 to-brand-500" />
+            </div>
+          </div>
         </div>
       </div>
     </section>

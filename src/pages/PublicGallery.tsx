@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import api from "../../api/axios";
 import axios from "axios";
 import JSZip from "jszip";
+import FaceSearchModal, { type FaceSearchResult } from "../components/FaceSearchModal";
+import Logo from '../components/Logo'
 
 interface GalleryPhoto {
   id: string;
@@ -118,7 +120,7 @@ function useColumnCount(): number {
 
 function CalendarIcon() {
   return (
-    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/25 text-indigo-200">
+    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500/25 text-brand-300">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
         <rect x="3.5" y="5" width="17" height="15.5" rx="3" stroke="currentColor" strokeWidth="1.8" />
         <path d="M3.5 10h17" stroke="currentColor" strokeWidth="1.8" />
@@ -144,6 +146,17 @@ function PinIcon() {
         <circle cx="12" cy="10" r="2.4" stroke="currentColor" strokeWidth="1.8" />
       </svg>
     </span>
+  );
+}
+
+function FaceIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+      <path d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="9.5" cy="10.5" r="1" fill="currentColor" />
+      <circle cx="14.5" cy="10.5" r="1" fill="currentColor" />
+      <path d="M9 14.5c1.6 1.4 4.4 1.4 6 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
   );
 }
 
@@ -235,11 +248,30 @@ export default function PublicGallery() {
     };
   }, [public_token]);
 
-  // Photos affichables, de la première à la dernière
-  const photos = useMemo(
+  // Recherche par visage
+  const [faceOpen, setFaceOpen] = useState(false);
+  const [faceResult, setFaceResult] = useState<FaceSearchResult | null>(null);
+
+  // Toutes les photos affichables, de la première à la dernière
+  const allPhotos = useMemo(
     () => (event?.photos ?? []).filter((p) => p.file_url || p.thumbnail_url),
     [event]
   );
+
+  // Photos visibles : toutes, ou seulement celles où la personne apparaît
+  const photos = useMemo(() => {
+    if (!faceResult) return allPhotos;
+    const matched = new Set(faceResult.matches.map((m) => m.photo_id));
+    return allPhotos.filter((p) => matched.has(p.id));
+  }, [allPhotos, faceResult]);
+
+  const applyFaceResult = (result: FaceSearchResult | null) => {
+    setFaceResult(result);
+    setFaceOpen(false);
+    setSelectedIndex(null);
+    setSelectedIds(new Set());
+    document.getElementById("photos")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Répartition en colonnes : chaque photo va dans la colonne la plus courte,
   // ce qui garde l'ordre de lecture de gauche à droite puis de haut en bas.
@@ -296,6 +328,14 @@ export default function PublicGallery() {
   // Téléchargements
   // -------------------------------------------------------------
 
+  /** Signale au photographe combien de photos ont été téléchargées (statistiques). */
+  const trackDownload = (count: number) => {
+    if (!public_token || count <= 0) return;
+    api
+      .post(`/public/events/${encodeURIComponent(public_token)}/downloads`, { count })
+      .catch(() => undefined); // ne jamais gêner l'invité
+  };
+
   const downloadOne = async (photo: GalleryPhoto, index: number) => {
     if (!photo.file_url) return;
     try {
@@ -303,6 +343,7 @@ export default function PublicGallery() {
       if (!response.ok) throw new Error("Échec du téléchargement");
       const blob = await response.blob();
       triggerDownload(blob, `${baseName(photo, index)}${extensionFrom(photo, blob)}`);
+      trackDownload(1);
     } catch (err) {
       console.error("Erreur de téléchargement :", err);
       alert("Impossible de télécharger la photo.");
@@ -378,6 +419,7 @@ export default function PublicGallery() {
       );
 
       triggerDownload(content, `${slugify(event.name)}${suffix}-photiva.zip`);
+      trackDownload(toDownload.length - failed);
 
       if (failed > 0) {
         alert(`${failed} photo(s) n'ont pas pu être ajoutées à l'archive.`);
@@ -410,7 +452,7 @@ export default function PublicGallery() {
     return (
       <main className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 text-white">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-indigo-500" />
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-brand-500" />
           <p className="text-sm text-neutral-400">Chargement de votre galerie...</p>
         </div>
       </main>
@@ -429,7 +471,7 @@ export default function PublicGallery() {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-6 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
+            className="mt-6 rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-400"
           >
             Réessayer
           </button>
@@ -473,7 +515,7 @@ export default function PublicGallery() {
         key={photo.id}
         className={`group relative overflow-hidden rounded-lg bg-neutral-900 transition sm:rounded-xl ${
           mode === "grid" ? "aspect-square" : ""
-        } ${isSelected ? "ring-[3px] ring-indigo-500 ring-offset-1 ring-offset-neutral-950 sm:ring-offset-2" : ""}`}
+        } ${isSelected ? "ring-[3px] ring-brand-500 ring-offset-1 ring-offset-neutral-950 sm:ring-offset-2" : ""}`}
         style={mode === "mosaic" ? { aspectRatio: ratio } : undefined}
       >
         <button
@@ -481,7 +523,7 @@ export default function PublicGallery() {
           onClick={() =>
             selectMode ? toggleSelected(photo.id) : setSelectedIndex(index)
           }
-          className="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500"
+          className="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500"
           aria-label={
             selectMode
               ? `${isSelected ? "Désélectionner" : "Sélectionner"} la photo ${index + 1}`
@@ -507,7 +549,7 @@ export default function PublicGallery() {
           <span
             className={`pointer-events-none absolute left-1.5 top-1.5 flex h-6 w-6 items-center sm:left-2.5 sm:top-2.5 sm:h-7 sm:w-7 justify-center rounded-full border-2 shadow-md transition ${
               isSelected
-                ? "border-indigo-500 bg-indigo-500 text-white"
+                ? "border-brand-500 bg-brand-500 text-white"
                 : "border-white/90 bg-black/30 text-transparent backdrop-blur-sm"
             }`}
             aria-hidden="true"
@@ -542,9 +584,7 @@ export default function PublicGallery() {
       {/* En-tête */}
       <header className="border-b border-white/10">
         <div className="mx-auto flex max-w-7xl 2xl:max-w-[1600px] items-center justify-between px-3 py-4 sm:px-6 sm:py-5 lg:px-8">
-          <a href="/" className="text-xl font-bold tracking-tight">
-            Photiva<span className="text-indigo-400">.</span>
-          </a>
+          <Logo size="sm" onDark />
           <span className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-neutral-400">
             Galerie publique
           </span>
@@ -591,12 +631,23 @@ export default function PublicGallery() {
                 </span>
               )}
             </div>
+
+            {allPhotos.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setFaceOpen(true)}
+                className="mt-5 inline-flex items-center gap-2.5 rounded-full bg-white py-2.5 pl-3 pr-5 text-sm font-semibold text-neutral-900 shadow-lg transition hover:-translate-y-0.5 hover:bg-neutral-100 sm:mt-6 sm:py-3"
+              >
+                <FaceIcon />
+                Retrouver mes photos
+              </button>
+            )}
           </div>
         </div>
       </section>
 
       {/* Barre d'outils collante */}
-      <div className="sticky top-0 z-30 mt-5 sm:mt-8 border-y border-white/10 bg-neutral-950/85 backdrop-blur-md">
+      <div id="photos" className="sticky top-0 z-30 mt-5 sm:mt-8 scroll-mt-0 border-y border-white/10 bg-neutral-950/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl 2xl:max-w-[1600px] flex-wrap items-center justify-between gap-x-3 gap-y-2 px-3 py-2.5 sm:px-6 sm:py-3 lg:px-8">
           <div className="flex items-center gap-3">
             <h2 className="text-base font-semibold tracking-tight sm:text-lg">Les photos</h2>
@@ -674,11 +725,11 @@ export default function PublicGallery() {
                 type="button"
                 onClick={() => void downloadAll()}
                 disabled={zipBusy}
-                className="relative overflow-hidden rounded-xl bg-indigo-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-wait sm:px-4 sm:py-2.5"
+                className="relative overflow-hidden rounded-xl bg-brand-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-400 disabled:cursor-wait sm:px-4 sm:py-2.5"
               >
                 {zipBusy && (
                   <span
-                    className="absolute inset-y-0 left-0 bg-indigo-400/40 transition-[width] duration-200"
+                    className="absolute inset-y-0 left-0 bg-brand-400/40 transition-[width] duration-200"
                     style={{ width: `${zipPercent}%` }}
                     aria-hidden="true"
                   />
@@ -708,9 +759,65 @@ export default function PublicGallery() {
         )}
       </div>
 
+      {/* Résultat de la recherche par visage */}
+      {faceResult && (
+        <div className="mx-auto max-w-7xl 2xl:max-w-[1600px] px-2 pt-4 sm:px-6 sm:pt-6 lg:px-8">
+          <div
+            role="status"
+            className={`flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between ${
+              faceResult.count > 0
+                ? "border-brand-500/30 bg-brand-500/10"
+                : "border-white/10 bg-white/5"
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <span
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                  faceResult.count > 0 ? "bg-brand-500 text-white" : "bg-white/10 text-neutral-300"
+                }`}
+              >
+                <FaceIcon />
+              </span>
+              <div>
+                <p className="font-semibold">
+                  {faceResult.count > 0
+                    ? `Vous apparaissez sur ${faceResult.count} photo${faceResult.count > 1 ? "s" : ""}`
+                    : "Aucune photo trouvée"}
+                </p>
+                <p className="mt-0.5 text-sm text-neutral-400">
+                  {faceResult.count > 0
+                    ? "Seules vos photos sont affichées. Vous pouvez toutes les télécharger."
+                    : faceResult.indexed_photos === 0
+                      ? "La reconnaissance faciale n'est pas encore activée pour cette galerie."
+                      : "Essayez avec un autre selfie : bien éclairé, visage de face."}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex shrink-0 gap-2">
+              <button
+                type="button"
+                onClick={() => setFaceOpen(true)}
+                className="flex-1 rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 sm:flex-none"
+              >
+                Réessayer
+              </button>
+              <button
+                type="button"
+                onClick={() => applyFaceResult(null)}
+                className="flex-1 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-200 sm:flex-none"
+              >
+                Toutes les photos
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Photos */}
       <section className="mx-auto max-w-7xl 2xl:max-w-[1600px] px-2 py-4 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         {photos.length === 0 ? (
+          faceResult ? null : (
           <div className="rounded-2xl border border-dashed border-white/15 px-6 py-16 text-center">
             <div className="text-4xl">🖼️</div>
             <h3 className="mt-4 text-lg font-medium">Les photos arrivent bientôt</h3>
@@ -718,6 +825,7 @@ export default function PublicGallery() {
               Aucune photo n'est disponible pour le moment.
             </p>
           </div>
+          )
         ) : view === "mosaic" ? (
           <div className="flex gap-2 sm:gap-3 lg:gap-4">
             {columns.map((col, c) => (
@@ -746,7 +854,7 @@ export default function PublicGallery() {
         <div className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-4 sm:pb-6">
           <div className="mx-auto flex max-w-2xl items-center justify-between gap-2 rounded-2xl border border-white/10 bg-neutral-900/95 px-3 py-2.5 shadow-2xl backdrop-blur-md sm:gap-3 sm:px-4 sm:py-3">
             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-              <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-indigo-600 px-2 text-sm font-bold tabular-nums">
+              <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-brand-500 px-2 text-sm font-bold tabular-nums">
                 {selectedIds.size}
               </span>
               <span className="hidden text-sm text-neutral-300 min-[420px]:inline">
@@ -763,7 +871,7 @@ export default function PublicGallery() {
                   )
                 }
                 disabled={zipBusy}
-                className="text-xs font-medium text-indigo-300 underline-offset-4 hover:underline disabled:opacity-50 sm:text-sm"
+                className="text-xs font-medium text-brand-300 underline-offset-4 hover:underline disabled:opacity-50 sm:text-sm"
               >
                 {selectedIds.size === photos.length ? "Tout désélectionner" : "Tout sélectionner"}
               </button>
@@ -773,11 +881,11 @@ export default function PublicGallery() {
               type="button"
               onClick={() => void downloadSelection()}
               disabled={selectedIds.size === 0 || zipBusy}
-              className="relative shrink-0 overflow-hidden rounded-xl bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
+              className="relative shrink-0 overflow-hidden rounded-xl bg-brand-500 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-400 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
             >
               {zipBusy && (
                 <span
-                  className="absolute inset-y-0 left-0 bg-indigo-400/40 transition-[width] duration-200"
+                  className="absolute inset-y-0 left-0 bg-brand-400/40 transition-[width] duration-200"
                   style={{ width: `${zipPercent}%` }}
                   aria-hidden="true"
                 />
@@ -796,6 +904,15 @@ export default function PublicGallery() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Recherche par selfie */}
+      {faceOpen && public_token && (
+        <FaceSearchModal
+          publicToken={public_token}
+          onClose={() => setFaceOpen(false)}
+          onResult={applyFaceResult}
+        />
       )}
 
       {/* Visionneuse plein écran */}

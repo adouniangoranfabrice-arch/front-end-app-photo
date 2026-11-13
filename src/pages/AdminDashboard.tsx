@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import PhotographersList from '../components/PhotographersList'
-import { useLogout } from "../utils/logout";
+import UserMenu from "../components/UserMenu";
+import ProfileView from "../components/ProfileView";
+import AdminReports from "../components/AdminReports";
+import AdminEvents from "../components/AdminEvents";
 import RecentActivities from '../components/RecentActivities'
+import Logo from '../components/Logo'
 
 
-type View = 'overview' | 'users' | 'events' | 'photos' | 'reports' | 'settings'
+type View = 'overview' | 'users' | 'events' | 'photos' | 'reports' | 'settings' | 'profile'
 
 const SIDEBAR_ITEMS: { id: View; label: string; icon: React.ReactNode }[] = [
   {
@@ -145,39 +148,11 @@ const USERS: User[] = [
   { id: '8', name: 'Olivier Framed', email: 'olivier@mail.com', plan: 'Pro', events: 9, photos: 4200, joinedDate: '02 Mai 2026', status: 'actif', avatar: 'OF' },
 ]
 
-interface AdminEvent {
-  name: string
-  photographer: string
-  date: string
-  photos: number
-  status: 'Terminé' | 'Traitement' | 'En attente'
-  statusColor: 'emerald' | 'gold' | 'ink'
-}
-
-const ADMIN_EVENTS: AdminEvent[] = [
-  { name: 'Mariage Kouassi & Grâce', photographer: 'Kouassi Photo', date: '15 Sept 2026', photos: 420, status: 'Terminé', statusColor: 'emerald' },
-  { name: 'Baptême Baby Aya', photographer: 'Aya Photography', date: '22 Sept 2026', photos: 180, status: 'Traitement', statusColor: 'gold' },
-  { name: 'Conférence TechAbidjan', photographer: 'Divine Shots', date: '28 Sept 2026', photos: 0, status: 'En attente', statusColor: 'ink' },
-  { name: 'Concert Fête de la Musique', photographer: 'Grâce Studio', date: '01 Oct 2026', photos: 680, status: 'Traitement', statusColor: 'gold' },
-  { name: 'Gala CCI Abidjan', photographer: 'Nadège Capture', date: '05 Oct 2026', photos: 1200, status: 'Terminé', statusColor: 'emerald' },
-  { name: 'Mariage Yao & Berthe', photographer: 'Olivier Framed', date: '10 Oct 2026', photos: 0, status: 'En attente', statusColor: 'ink' },
-]
-
-const eventStatusStyles: Record<string, string> = {
-  emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  gold: 'bg-gold-500/10 bg-indigo-600 border-gold-500/20',
-  ink: 'bg-ink-700/40 text-ink-400 border-ink-600/40',
-}
 
 export default function AdminDashboard() {
   const [activeView, setActiveView] = useState<View>('overview')
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [eventSearch, setEventSearch] = useState('')
-  const logout = useLogout();
 
-  const filteredEvents = ADMIN_EVENTS.filter(
-    (e) => !eventSearch || e.name.toLowerCase().includes(eventSearch.toLowerCase()) || e.photographer.toLowerCase().includes(eventSearch.toLowerCase()),
-  )
 
   const activeUsers = USERS.filter((u) => u.status === 'actif').length
   const pendingUsers = USERS.filter((u) => u.status === 'en attente').length
@@ -197,19 +172,7 @@ export default function AdminDashboard() {
         }`}
       >
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 px-6 py-6 border-b border-overlay/[0.04]">
-          <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-gold-400 to-gold-600 text-ink-950">
-            <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-              <path d="M3 9.5L7 4h10l4 5.5v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-              <circle cx="12" cy="13" r="3.5" stroke="currentColor" strokeWidth="2" />
-              <path d="M8 4l1.5 2h5L16 4" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
-          </span>
-          <div className="flex flex-col">
-            <span className="font-display text-lg font-extrabold text-gradient-gold">SnapEvent</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider bg-indigo-600/70">Admin</span>
-          </div>
-        </Link>
+        <div className="px-6 py-5 border-b border-overlay/[0.04]"><Logo size="sm" subtitle="Administration" /></div>
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto">
@@ -219,7 +182,7 @@ export default function AdminDashboard() {
               onClick={() => { setActiveView(item.id); setSidebarOpen(false) }}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 activeView === item.id
-                  ? 'bg-gold-500/10 bg-indigo-600 border border-gold-500/20'
+                  ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20'
                   : 'text-ink-400 hover:text-ink-100 hover:bg-overlay/[0.04] border border-transparent'
               }`}
             >
@@ -229,27 +192,12 @@ export default function AdminDashboard() {
           ))}
         </nav>
 
-        {/* Admin user + logout */}
-        <div className="px-3 py-4 border-t border-overlay/[0.04]">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-ink-800/50">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white font-bold text-sm shrink-0">
-              AD
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-ink-100 truncate">Administrateur</p>
-              <p className="text-xs text-ink-500 truncate">Super Admin</p>
-            </div>
-          </div>
-          <button
-           onClick={logout}
-            className="flex items-center gap-2 px-4 py-2.5 mt-2 text-sm text-ink-500 hover:text-red-400 transition-colors"
-          >
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Déconnexion
-          </button>
-        </div>
+        {/* Utilisateur connecté */}
+        <UserMenu
+          variant="admin"
+          active={activeView === 'profile'}
+          onOpenProfile={() => { setActiveView('profile'); setSidebarOpen(false) }}
+        />
       </aside>
 
       {/* Main content */}
@@ -273,6 +221,7 @@ export default function AdminDashboard() {
               {activeView === 'photos' && 'Toutes les photos'}
               {activeView === 'reports' && 'Rapports'}
               {activeView === 'settings' && 'Paramètres système'}
+              {activeView === 'profile' && 'Mon profil'}
             </h1>
           </div>
 
@@ -291,20 +240,22 @@ export default function AdminDashboard() {
 
         <main className="flex-1 p-6 overflow-y-auto">
           {/* ===== OVERVIEW ===== */}
+          {activeView === 'profile' && <ProfileView />}
+
           {activeView === 'overview' && (
             <div className="space-y-8">
               <div>
                 <h2 className="text-2xl md:text-3xl font-extrabold text-ink-50 font-display">
                   Tableau de bord administrateur
                 </h2>
-                <p className="text-sm text-ink-400 mt-1">Vue d'ensemble de la plateforme SnapEvent</p>
+                <p className="text-sm text-ink-400 mt-1">Vue d'ensemble de la plateforme Photiva</p>
               </div>
 
               {/* Stats grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 {PLATFORM_STATS.map((stat) => (
                   <div key={stat.label} className="p-5 rounded-2xl bg-ink-900/60 border border-overlay/[0.06] transition-all hover:border-overlay/15">
-                    <div className="w-11 h-11 rounded-xl bg-gold-500/10 border border-gold-500/15 flex items-center justify-center bg-indigo-600 mb-4">
+                    <div className="w-11 h-11 rounded-xl bg-brand-500/10 border border-brand-500/15 flex items-center justify-center text-brand-400 mb-4">
                       {stat.icon}
                     </div>
                     <p className="text-3xl font-extrabold text-ink-50 font-display mb-1">{stat.value}</p>
@@ -335,12 +286,12 @@ export default function AdminDashboard() {
                       </div>
                       <span className="text-lg font-bold text-emerald-400">{activeUsers}</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-gold-500/5 border border-gold-500/15">
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-brand-500/5 border border-brand-500/15">
                       <div className="flex items-center gap-3">
-                        <span className="w-3 h-3 rounded-full bg-gold-400" />
+                        <span className="w-3 h-3 rounded-full bg-brand-400" />
                         <span className="text-sm text-ink-200">En attente</span>
                       </div>
-                      <span className="text-lg font-bold bg-indigo-600">{pendingUsers}</span>
+                      <span className="text-lg font-bold text-brand-400">{pendingUsers}</span>
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-xl bg-red-500/5 border border-red-500/15">
                       <div className="flex items-center gap-3">
@@ -380,71 +331,7 @@ export default function AdminDashboard() {
           
 
           {/* ===== EVENTS ===== */}
-          {activeView === 'events' && (
-            <div className="space-y-6">
-              <div className="relative">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-500">
-                  <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
-                  <path d="M21 21l-4.3-4.3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-                <input
-                  type="text"
-                  value={eventSearch}
-                  onChange={(e) => setEventSearch(e.target.value)}
-                  placeholder="Rechercher un événement ou un photographe..."
-                  className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-ink-900/60 border border-overlay/[0.06] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/30"
-                />
-              </div>
-
-              <div className="rounded-2xl bg-ink-900/60 border border-overlay/[0.06] overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-overlay/[0.06]">
-                        <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-ink-500">Événement</th>
-                        <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-ink-500 hidden md:table-cell">Photographe</th>
-                        <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-ink-500 hidden sm:table-cell">Date</th>
-                        <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-ink-500 hidden lg:table-cell">Photos</th>
-                        <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-ink-500">Statut</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredEvents.map((event, i) => (
-                        <tr key={i} className="border-b border-overlay/[0.04] hover:bg-overlay/[0.02] transition-colors">
-                          <td className="px-5 py-4">
-                            <span className="text-sm font-semibold text-ink-100">{event.name}</span>
-                          </td>
-                          <td className="px-5 py-4 hidden md:table-cell">
-                            <span className="text-sm text-ink-300">{event.photographer}</span>
-                          </td>
-                          <td className="px-5 py-4 hidden sm:table-cell">
-                            <span className="text-sm text-ink-400">{event.date}</span>
-                          </td>
-                          <td className="px-5 py-4 hidden lg:table-cell">
-                            <span className="text-sm text-ink-200">{event.photos}</span>
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${eventStatusStyles[event.statusColor]}`}>
-                              {event.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                {filteredEvents.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-16 text-ink-500">
-                    <svg viewBox="0 0 24 24" width="40" height="40" fill="none">
-                      <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                      <path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                    <p className="text-sm mt-3">Aucun événement trouvé</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          {activeView === 'events' && <AdminEvents />}
 
           {/* ===== PHOTOS ===== */}
           {activeView === 'photos' && (
@@ -471,7 +358,7 @@ export default function AdminDashboard() {
                     return (
                       <div key={month} className="flex-1 flex flex-col items-center gap-2">
                         <div
-                          className="w-full rounded-t-lg bg-gradient-to-t from-gold-600 to-gold-400 transition-all duration-500 hover:from-gold-500 hover:to-gold-300"
+                          className="w-full rounded-t-lg bg-gradient-to-t from-brand-600 to-brand-400 transition-all duration-500 hover:from-brand-500 hover:to-brand-300"
                           style={{ height: `${height}%` }}
                         />
                         <span className="text-xs text-ink-500">{month}</span>
@@ -484,67 +371,7 @@ export default function AdminDashboard() {
           )}
 
           {/* ===== REPORTS ===== */}
-          {activeView === 'reports' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  { label: 'Revenu total', value: '28 540 €', sub: 'Depuis le lancement' },
-                  { label: 'MRR', value: '4 280 €', sub: 'Septembre 2026' },
-                  { label: 'Utilisateurs payants', value: '847', sub: '68% des utilisateurs' },
-                  { label: 'Churn rate', value: '2,1 %', sub: '-0,3% vs août' },
-                ].map((r) => (
-                  <div key={r.label} className="p-5 rounded-2xl bg-ink-900/60 border border-overlay/[0.06]">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-ink-500 mb-2">{r.label}</p>
-                    <p className="text-2xl font-extrabold text-ink-50 font-display mb-1">{r.value}</p>
-                    <p className="text-xs text-ink-400">{r.sub}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="rounded-2xl bg-ink-900/60 border border-overlay/[0.06] p-6">
-                <h3 className="text-lg font-bold text-ink-50 font-body mb-5">Croissance des utilisateurs</h3>
-                <div className="flex items-end gap-2 h-48">
-                  {['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept'].map((month, i) => {
-                    const height = 15 + i * 9
-                    return (
-                      <div key={month} className="flex-1 flex flex-col items-center gap-2">
-                        <span className="text-xs font-bold text-ink-300">{Math.round(200 + i * 120)}</span>
-                        <div
-                          className="w-full rounded-t-lg bg-gradient-to-t from-gold-600 to-gold-400 transition-all duration-500 hover:from-gold-500 hover:to-gold-300"
-                          style={{ height: `${height}%` }}
-                        />
-                        <span className="text-xs text-ink-500">{month}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              <div className="rounded-2xl bg-ink-900/60 border border-overlay/[0.06] p-6">
-                <h3 className="text-lg font-bold text-ink-50 font-body mb-5">Répartition des plans</h3>
-                <div className="flex flex-col gap-4">
-                  {[
-                    { plan: 'Gratuit', count: 401, pct: 32, color: 'from-ink-600 to-ink-500' },
-                    { plan: 'Pro', count: 612, pct: 49, color: 'from-gold-600 to-gold-400' },
-                    { plan: 'Studio', count: 235, pct: 19, color: 'from-emerald-600 to-emerald-400' },
-                  ].map((p) => (
-                    <div key={p.plan}>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-sm font-medium text-ink-200">{p.plan}</span>
-                        <span className="text-sm text-ink-400">{p.count} utilisateurs ({p.pct}%)</span>
-                      </div>
-                      <div className="h-3 rounded-full bg-ink-800 overflow-hidden">
-                        <div
-                          className={`h-full rounded-full bg-gradient-to-r ${p.color} transition-all duration-500`}
-                          style={{ width: `${p.pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+          {activeView === 'reports' && <AdminReports />}
 
           {/* ===== SETTINGS ===== */}
           {activeView === 'settings' && (
@@ -556,16 +383,16 @@ export default function AdminDashboard() {
                     <label className="block text-sm font-medium text-ink-300 mb-2">Nom de la plateforme</label>
                     <input
                       type="text"
-                      defaultValue="SnapEvent"
-                      className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                      defaultValue="Photiva"
+                      className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-ink-300 mb-2">Email de contact</label>
                     <input
                       type="email"
-                      defaultValue="contact@snapevent.io"
-                      className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                      defaultValue="contact@photiva.ci"
+                      className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
                     />
                   </div>
                   <div>
@@ -573,7 +400,7 @@ export default function AdminDashboard() {
                     <input
                       type="number"
                       defaultValue="10"
-                      className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                      className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
                     />
                   </div>
                 </div>
@@ -594,7 +421,7 @@ export default function AdminDashboard() {
                         <p className="text-xs text-ink-500 mt-0.5">{toggle.desc}</p>
                       </div>
                       <button
-                        className={`relative w-12 h-6 rounded-full transition-colors ${toggle.defaultOn ? 'bg-gold-500' : 'bg-ink-700'}`}
+                        className={`relative w-12 h-6 rounded-full transition-colors ${toggle.defaultOn ? 'bg-brand-500' : 'bg-ink-700'}`}
                       >
                         <span
                           className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${toggle.defaultOn ? 'translate-x-6' : 'translate-x-0.5'}`}
@@ -605,7 +432,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <button className="px-6 py-3 rounded-xl bg-gradient-to-r from-gold-400 to-gold-600 text-ink-950 font-semibold shadow-lg shadow-gold-500/20 transition-all hover:-translate-y-0.5">
+              <button className="px-6 py-3 rounded-xl bg-gradient-to-r from-brand-400 to-brand-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:-translate-y-0.5">
                 Enregistrer les modifications
               </button>
             </div>

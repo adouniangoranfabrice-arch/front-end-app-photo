@@ -68,6 +68,43 @@ export default function MyEvents() {
   const [deleteError, setDeleteError] = useState("");
   const [notice, setNotice] = useState("");
 
+  // Analyse des visages (photos importées avant la reconnaissance faciale)
+  const [indexingEventId, setIndexingEventId] = useState<string | null>(null);
+
+  async function handleIndexFaces(eventId: string) {
+    setIndexingEventId(eventId);
+    const key = `faces-${eventId}`;
+
+    try {
+      const { data } = await api.post<{
+        photos_indexed: number;
+        faces_found: number;
+        failed: number;
+      }>(`/faces/events/${encodeURIComponent(eventId)}/index`, null, {
+        timeout: 0, // peut être long : une analyse par photo
+      });
+
+      setUploadMessages((previous) => ({
+        ...previous,
+        [key]:
+          data.photos_indexed === 0 && data.failed === 0
+            ? "Toutes les photos sont déjà analysées : la recherche par visage est active."
+            : `${data.photos_indexed} photo(s) analysée(s), ${data.faces_found} visage(s) trouvé(s)` +
+              (data.failed > 0 ? `, ${data.failed} échec(s).` : "."),
+      }));
+    } catch (err: unknown) {
+      setUploadMessages((previous) => ({
+        ...previous,
+        [key]:
+          axios.isAxiosError(err) && typeof err.response?.data?.detail === "string"
+            ? err.response.data.detail
+            : "L'analyse des visages a échoué.",
+      }));
+    } finally {
+      setIndexingEventId(null);
+    }
+  }
+
 const [uploadMessages, setUploadMessages] = useState<
   Record<string, string>
 >({});
@@ -291,358 +328,351 @@ async function handleUpload(eventId: string, files: FileList | null) {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50 p-6">
-        <p className="text-center text-gray-600">
-          Chargement de tes événements...
-        </p>
-      </main>
+      <section aria-busy="true" aria-label="Chargement des événements">
+        <div className="mb-6 h-8 w-56 animate-pulse rounded-lg bg-ink-800" />
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="overflow-hidden rounded-2xl border border-overlay/[0.06] bg-ink-900/60">
+              <div className="h-44 animate-pulse bg-ink-800" />
+              <div className="space-y-3 p-5">
+                <div className="h-4 w-2/3 animate-pulse rounded bg-ink-800" />
+                <div className="h-3 w-1/2 animate-pulse rounded bg-ink-800" />
+                <div className="h-24 animate-pulse rounded-xl bg-ink-800/70" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-8">
-      <div className="mx-auto max-w-full">
-        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Mes événements
-            </h1>
-            <p className="mt-2 text-gray-600">
-              Retrouve et gère tous tes événements.
-            </p>
+    <section>
+      {/* En-tête de section */}
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="flex items-center gap-3">
+            <h2 className="font-display text-2xl font-bold text-ink-50">Mes événements</h2>
+            <span className="rounded-full border border-brand-500/20 bg-brand-500/10 px-2.5 py-0.5 text-xs font-semibold tabular-nums text-brand-400">
+              {events.length}
+            </span>
           </div>
-
-          <span className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-semibold text-indigo-700">
-            {events.length} événement{events.length > 1 ? "s" : ""}
-          </span>
+          <p className="mt-1 text-sm text-ink-400">
+            Importez vos photos, partagez le lien et laissez vos invités se retrouver.
+          </p>
         </div>
 
-        <div className="mb-8">
+        <label className="relative block w-full sm:w-72">
+          <span className="sr-only">Rechercher un événement</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-500">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
+            <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
           <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher un événement..."
-            aria-label="Rechercher un événement"
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+            placeholder="Rechercher…"
+            className="input pl-10"
           />
-        </div>
-
-        {notice && (
-          <div
-            role="status"
-            className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-700"
-          >
-            {notice}
-          </div>
-        )}
-
-        {error && (
-          <div
-            role="alert"
-            className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700"
-          >
-            {error}
-          </div>
-        )}
-
-        {!error && filteredEvents.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center">
-            <h2 className="text-xl font-semibold text-gray-800">
-              {events.length === 0
-                ? "Aucun événement pour le moment"
-                : "Aucun résultat"}
-            </h2>
-
-            <p className="mt-2 text-gray-500">
-              {events.length === 0
-                ? "Tes événements apparaîtront ici une fois créés."
-                : "Essaie avec un autre terme de recherche."}
-            </p>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        
-        {filteredEvents.map((event) => {
-  const eventId = event.id ?? event.id;
-  const coverUrl = getCoverUrl(event);
-
-  if (!eventId) {
-    console.error("Identifiant de l'événement absent :", event);
-    return null;
-  }
-
-  const progress = uploadProgress[eventId];
-  const isUploading = progress !== undefined;
-
-  return (
-    <article key={eventId}>
-      <div className="relative h-52 bg-gray-200">
-        {coverUrl ? (
-          <img
-            src={coverUrl}
-            alt={`Image de ${event.name}`}
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-gray-500">
-            Aucune image disponible
-          </div>
-        )}
-
-        <button
-          type="button"
-          onClick={() => {
-            setDeleteError("");
-            setEventToDelete(event);
-          }}
-          disabled={isUploading}
-          className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-red-600 shadow-sm transition hover:bg-red-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label={`Supprimer l'événement ${event.name}`}
-          title={isUploading ? "Import en cours" : "Supprimer l'événement"}
-        >
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
-            <path
-              d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 002 2h8a2 2 0 002-2l1-12M9 7V4h6v3"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          Supprimer
-        </button>
-
-        {event.type && (
-          <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
-            {event.type}
-          </span>
-        )}
-      </div>
-
-
-        {/* {event.public_url && (
-          <p className="mt-3 text-sm text-gray-600">
-            <span className="font-medium">Lien :</span>{" "}
-            {event.public_url}
-          </p>
-        )} */}
-
-        
-        {event.public_url && (
-        <div className="mt-5">
-            <label className="mb-2 block text-center text-sm font-semibold text-gray-500">
-            Lien de la galerie
-            </label>
-
-            <div className="flex items-center gap-2">
-            <div className="min-w-0 flex-1 truncate rounded-xl border border-white/10 bg-indigo-200 px-4 py-3 text-sm text-indigo-300">
-                {event.public_url}
-            </div>
-
-            <button
-                type="button"
-                onClick={async () => {
-                try {
-                    await navigator.clipboard.writeText(event.public_url!);
-                    setUploadMessages((previous) => ({
-                    ...previous,
-                    [`gallery-${event.id}`]: "Lien copié !",
-                    }));
-                } catch {
-                    setUploadMessages((previous) => ({
-                    ...previous,
-                    [`gallery-${event.id}`]: "Impossible de copier le lien.",
-                    }));
-                }
-                }}
-                className="shrink-0 rounded-xl bg-indigo-500/10 px-4 py-3 text-sm font-semibold text-indigo-600 transition hover:bg-indigo-500/20"
-            >
-                Copier
-            </button>
-            </div>
-
-            {uploadMessages[`gallery-${event.id}`] && (
-            <p role="status" className="mt-2 text-xs text-gray-400">
-                {uploadMessages[`gallery-${event.id}`]}
-            </p>
-            )}
-        </div>
-        )}
-
-
-        {event.created_at && (
-          <p className="mt-3 text-sm text-gray-600">
-            <span className="font-medium">Date :</span>{" "}
-            {event.created_at}
-          </p>
-        )}
-
-        {event.location && (
-          <p className="mt-2 text-sm text-gray-600">
-            <span className="font-medium">Lieu :</span>{" "}
-            {event.location}
-          </p>
-        )}
-
-        {event.description && (
-          <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-500">
-            {event.description}
-          </p>
-        )}
-
-      {/* Bouton d'ajout de photos */}
-      {/* <div className="mt-5">
-        <label
-          className={`inline-flex cursor-pointer items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-white transition ${
-            uploadingEventId !== null
-              ? "cursor-not-allowed bg-gray-400"
-              : "bg-indigo-600 hover:bg-indigo-700"
-          }`}
-        >
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            disabled={uploadingEventId !== null}
-            className="sr-only"
-            onChange={(e) => {
-              const files = e.currentTarget.files;
-              void handleUpload(eventId, files);
-              e.currentTarget.value = "";
-            }}
-          />
-
-          {uploadingEventId === eventId
-            ? "Importation en cours..."
-            : "＋ Ajouter des photos"}
         </label>
+      </div>
 
-        {uploadMessages[eventId] && (
-          <p
-            role="status"
-            className="mt-3 break-words text-sm text-gray-600"
-          >
-            {uploadMessages[eventId]}
+      {notice && (
+        <div role="status" className="alert-success mb-5">
+          {notice}
+        </div>
+      )}
+
+      {error && (
+        <div role="alert" className="alert-error mb-5">
+          {error}
+        </div>
+      )}
+
+      {!error && filteredEvents.length === 0 && (
+        <div className="flex flex-col items-center rounded-2xl border border-dashed border-overlay/[0.12] bg-ink-900/40 px-6 py-16 text-center">
+          <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="16" rx="2.5" stroke="currentColor" strokeWidth="1.7" />
+              <path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+            </svg>
+          </span>
+          <h3 className="font-body text-lg font-semibold text-ink-100">
+            {events.length === 0 ? "Aucun événement pour le moment" : "Aucun résultat"}
+          </h3>
+          <p className="mt-1 max-w-sm text-sm text-ink-400">
+            {events.length === 0
+              ? "Créez votre premier événement avec le bouton « Nouvel événement »."
+              : "Essayez avec un autre terme de recherche."}
           </p>
-        )}
-      </div> */}
-
-      
-<div className="mt-5">
-  <label
-    className={`flex min-h-[130px] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-6 text-center transition ${
-      isUploading
-        ? "cursor-not-allowed border-indigo-400 bg-indigo-500/5"
-        : "cursor-pointer border-gray-700 hover:border-indigo-500 hover:bg-indigo-500/5"
-    }`}
-    onDragOver={(e) => {
-      e.preventDefault();
-    }}
-    onDrop={(e) => {
-      e.preventDefault();
-
-      if (isUploading) return;
-
-      void handleUpload(eventId, e.dataTransfer.files);
-    }}
-  >
-    <input
-      type="file"
-      accept="image/*"
-      multiple
-      disabled={isUploading}
-      className="sr-only"
-      onChange={(e) => {
-        const files = e.currentTarget.files;
-        void handleUpload(eventId, files);
-        e.currentTarget.value = "";
-      }}
-    />
-
-    {progress ? (
-      <div className="w-full" aria-live="polite">
-        <div className="mb-2 flex items-baseline justify-between">
-          <span className="text-sm font-medium text-gray-600">
-            {progress.phase === "upload"
-              ? `Envoi de ${progress.fileCount} photo${progress.fileCount > 1 ? "s" : ""}…`
-              : "Traitement des photos sur le serveur…"}
-          </span>
-          <span className="text-2xl font-bold tabular-nums text-indigo-600">
-            {progress.percent}%
-          </span>
         </div>
+      )}
 
-        <div
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={progress.percent}
-          aria-label={`Progression de l'import pour ${event.name}`}
-          className="h-3 w-full overflow-hidden rounded-full bg-gray-200"
-        >
-          <div
-            className={`h-full rounded-full transition-[width] duration-200 ease-out ${
-              progress.phase === "processing"
-                ? "animate-pulse bg-emerald-500"
-                : "bg-indigo-600"
-            }`}
-            style={{ width: `${progress.percent}%` }}
-          />
-        </div>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3">
+        {filteredEvents.map((event) => {
+          const eventId = event.id;
+          const coverUrl = getCoverUrl(event);
 
-        <p className="mt-2 text-xs tabular-nums text-gray-500">
-          {progress.phase === "upload"
-            ? `${formatBytes(progress.loaded)} / ${formatBytes(progress.total)}`
-            : "Envoi terminé — enregistrement et analyse en cours, ne fermez pas la page."}
-        </p>
+          if (!eventId) {
+            console.error("Identifiant de l'événement absent :", event);
+            return null;
+          }
+
+          const progress = uploadProgress[eventId];
+          const isUploading = progress !== undefined;
+          const displayDate = formatEventDate(event.date ?? event.created_at);
+          const copyMessage = uploadMessages[`gallery-${eventId}`];
+
+          return (
+            <article
+              key={eventId}
+              className="group flex flex-col overflow-hidden rounded-2xl border border-overlay/[0.06] bg-ink-900/60 transition-all duration-300 hover:border-brand-500/25 hover:shadow-2xl hover:shadow-black/20"
+            >
+              {/* Couverture */}
+              <div className="relative h-44 overflow-hidden bg-ink-800">
+                {coverUrl ? (
+                  <img
+                    src={coverUrl}
+                    alt=""
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center bg-gradient-to-br from-ink-800 to-ink-900 text-ink-600">
+                    <svg viewBox="0 0 24 24" width="40" height="40" fill="none" aria-hidden="true">
+                      <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+                      <circle cx="9" cy="11" r="2" stroke="currentColor" strokeWidth="1.5" />
+                      <path d="M21 17l-5-5-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                )}
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+
+                {event.type && (
+                  <span className="absolute left-3 top-3 rounded-full bg-black/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white backdrop-blur">
+                    {event.type}
+                  </span>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeleteError("");
+                    setEventToDelete(event);
+                  }}
+                  disabled={isUploading}
+                  className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white/90 backdrop-blur transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label={`Supprimer l'événement ${event.name}`}
+                  title={isUploading ? "Import en cours" : "Supprimer l'événement"}
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+                    <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 002 2h8a2 2 0 002-2l1-12M9 7V4h6v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+
+                <h3 className="absolute inset-x-4 bottom-3 truncate font-display text-xl font-bold text-white">
+                  {event.name}
+                </h3>
+              </div>
+
+              <div className="flex flex-1 flex-col gap-4 p-5">
+                {/* Méta */}
+                {(displayDate || event.location) && (
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-ink-400">
+                    {displayDate && (
+                      <span className="flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true" className="text-brand-400">
+                          <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                          <path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                        </svg>
+                        {displayDate}
+                      </span>
+                    )}
+                    {event.location && (
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true" className="shrink-0 text-brand-400">
+                          <path d="M12 21s-7-6.1-7-11.5a7 7 0 1114 0C19 14.9 12 21 12 21z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                          <circle cx="12" cy="9.5" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+                        </svg>
+                        <span className="truncate">{event.location}</span>
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {event.description && (
+                  <p className="line-clamp-2 text-sm leading-6 text-ink-400">{event.description}</p>
+                )}
+
+                {/* Lien de la galerie */}
+                {event.public_url && (
+                  <div>
+                    <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-ink-500">
+                      Lien de la galerie
+                    </p>
+                    <div className="flex items-center gap-2 rounded-xl border border-overlay/[0.08] bg-ink-950/50 p-1.5 pl-3">
+                      <span className="min-w-0 flex-1 truncate text-sm text-ink-300" title={event.public_url}>
+                        {event.public_url.replace(/^https?:\/\//, "")}
+                      </span>
+                      <a
+                        href={event.public_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-400 transition hover:bg-overlay/[0.06] hover:text-ink-100"
+                        aria-label="Ouvrir la galerie"
+                        title="Ouvrir la galerie"
+                      >
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+                          <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </a>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          let message = "Lien copié !";
+                          try {
+                            await navigator.clipboard.writeText(event.public_url!);
+                          } catch {
+                            message = "Impossible de copier le lien.";
+                          }
+                          setUploadMessages((previous) => ({ ...previous, [`gallery-${eventId}`]: message }));
+                          window.setTimeout(() => {
+                            setUploadMessages((previous) => ({ ...previous, [`gallery-${eventId}`]: "" }));
+                          }, 2000);
+                        }}
+                        className="shrink-0 rounded-lg bg-brand-500/10 px-3 py-1.5 text-xs font-semibold text-brand-400 transition hover:bg-brand-500/20"
+                      >
+                        {copyMessage === "Lien copié !" ? "Copié ✓" : "Copier"}
+                      </button>
+                    </div>
+                    {copyMessage && copyMessage !== "Lien copié !" && (
+                      <p role="status" className="mt-1.5 text-xs text-red-400">{copyMessage}</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Import des photos */}
+                <div className="mt-auto">
+                  <label
+                    className={`flex min-h-[112px] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-5 text-center transition ${
+                      isUploading
+                        ? "cursor-not-allowed border-brand-500/50 bg-brand-500/5"
+                        : "cursor-pointer border-overlay/[0.12] hover:border-brand-500/60 hover:bg-brand-500/5"
+                    }`}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (isUploading) return;
+                      void handleUpload(eventId, e.dataTransfer.files);
+                    }}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      disabled={isUploading}
+                      className="sr-only"
+                      onChange={(e) => {
+                        const files = e.currentTarget.files;
+                        void handleUpload(eventId, files);
+                        e.currentTarget.value = "";
+                      }}
+                    />
+
+                    {progress ? (
+                      <div className="w-full" aria-live="polite">
+                        <div className="mb-2 flex items-baseline justify-between gap-3">
+                          <span className="text-left text-sm font-medium text-ink-300">
+                            {progress.phase === "upload"
+                              ? `Envoi de ${progress.fileCount} photo${progress.fileCount > 1 ? "s" : ""}…`
+                              : "Traitement sur le serveur…"}
+                          </span>
+                          <span className="font-display text-2xl font-bold tabular-nums text-brand-400">
+                            {progress.percent}%
+                          </span>
+                        </div>
+                        <div
+                          role="progressbar"
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-valuenow={progress.percent}
+                          aria-label={`Progression de l'import pour ${event.name}`}
+                          className="h-2 w-full overflow-hidden rounded-full bg-ink-800"
+                        >
+                          <div
+                            className={`h-full rounded-full transition-[width] duration-200 ease-out ${
+                              progress.phase === "processing"
+                                ? "animate-pulse bg-emerald-500"
+                                : "bg-gradient-to-r from-brand-400 to-brand-600"
+                            }`}
+                            style={{ width: `${progress.percent}%` }}
+                          />
+                        </div>
+                        <p className="mt-2 text-left text-xs tabular-nums text-ink-500">
+                          {progress.phase === "upload"
+                            ? `${formatBytes(progress.loaded)} / ${formatBytes(progress.total)}`
+                            : "Enregistrement et analyse en cours, ne fermez pas la page."}
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-overlay/[0.05] text-ink-300">
+                          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                            <path d="M12 16V4m0 0L8 8m4-4l4 4M5 14v4a2 2 0 002 2h10a2 2 0 002-2v-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </span>
+                        <span className="text-sm font-medium text-ink-200">
+                          Glissez vos photos ou <span className="text-brand-400">parcourez</span>
+                        </span>
+                        <span className="mt-1 text-xs text-ink-500">JPG, PNG, WEBP · jusqu'à 500 à la fois</span>
+                      </>
+                    )}
+                  </label>
+
+                  {uploadMessages[eventId] && (
+                    <p role="status" className="mt-2 break-words text-xs text-ink-400">
+                      {uploadMessages[eventId]}
+                    </p>
+                  )}
+
+                  {/* Analyse des visages des photos déjà importées */}
+                  <button
+                    type="button"
+                    onClick={() => void handleIndexFaces(eventId)}
+                    disabled={indexingEventId !== null || isUploading}
+                    className="btn-secondary mt-3 w-full"
+                  >
+                    {indexingEventId === eventId ? (
+                      <>
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand-500/25 border-t-brand-500" />
+                        Analyse des visages…
+                      </>
+                    ) : (
+                      <>
+                        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" aria-hidden="true" className="text-brand-400">
+                          <path d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                          <circle cx="12" cy="10.5" r="2.8" stroke="currentColor" strokeWidth="1.8" />
+                          <path d="M7.5 17a5 5 0 019 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                        </svg>
+                        Activer la recherche par visage
+                      </>
+                    )}
+                  </button>
+
+                  {uploadMessages[`faces-${eventId}`] && (
+                    <p role="status" className="mt-2 text-xs text-ink-400">
+                      {uploadMessages[`faces-${eventId}`]}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </article>
+          );
+        })}
       </div>
-    ) : (
-      <>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="mb-3 h-7 w-7 text-gray-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.8}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 16V4m0 0L8 8m4-4 4 4M5 14v4a2 2 0 002 2h10a2 2 0 002-2v-4"
-          />
-        </svg>
 
-        <span className="text-sm text-gray-400">
-          Glissez vos photos ici ou cliquez pour importer
-        </span>
-
-        <span className="mt-2 text-xs text-gray-500">
-          JPG, JPEG, PNG, .webp — jusqu'à 500 photos à la fois
-        </span>
-      </>
-    )}
-  </label>
-
-  {uploadMessages[eventId] && (
-    <p
-      role="status"
-      className="mt-3 break-words text-sm text-gray-600"
-    >
-      {uploadMessages[eventId]}
-    </p>
-  )}
-</div>
-
-    </article>
-  );
-})}
-
-        </div>
-      </div>
       {/* Confirmation de suppression */}
       {eventToDelete && (
         <div
@@ -652,34 +682,28 @@ async function handleUpload(eventId: string, files: FileList | null) {
           aria-labelledby="delete-event-title"
         >
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => !deleting && setEventToDelete(null)}
           />
 
-          <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+          <div className="relative w-full max-w-md rounded-2xl border border-overlay/[0.08] bg-ink-900 p-6 shadow-2xl">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15 text-red-400">
               <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
-                <path
-                  d="M12 9v4m0 4h.01M10.3 3.9L2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"
-                  stroke="#dc2626"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <path d="M12 9v4m0 4h.01M10.3 3.9L2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
 
-            <h2 id="delete-event-title" className="text-lg font-bold text-gray-900">
+            <h2 id="delete-event-title" className="font-body text-lg font-bold text-ink-50">
               Supprimer « {eventToDelete.name} » ?
             </h2>
-            <p className="mt-2 text-sm leading-6 text-gray-600">
-              L'événement, <strong>toutes ses photos</strong> et les visages
-              détectés seront définitivement supprimés. Le lien public ne
-              fonctionnera plus. Cette action est irréversible.
+            <p className="mt-2 text-sm leading-6 text-ink-400">
+              L'événement, <strong className="text-ink-200">toutes ses photos</strong> et les visages
+              détectés seront définitivement supprimés. Le lien public ne fonctionnera plus.
+              Cette action est irréversible.
             </p>
 
             {deleteError && (
-              <p role="alert" className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+              <p role="alert" className="alert-error mt-4">
                 {deleteError}
               </p>
             )}
@@ -689,7 +713,7 @@ async function handleUpload(eventId: string, files: FileList | null) {
                 type="button"
                 onClick={() => setEventToDelete(null)}
                 disabled={deleting}
-                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+                className="btn-ghost"
               >
                 Annuler
               </button>
@@ -697,7 +721,7 @@ async function handleUpload(eventId: string, files: FileList | null) {
                 type="button"
                 onClick={() => void confirmDelete()}
                 disabled={deleting}
-                className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-wait disabled:opacity-70"
+                className="btn-danger"
               >
                 {deleting && (
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
@@ -708,6 +732,13 @@ async function handleUpload(eventId: string, files: FileList | null) {
           </div>
         </div>
       )}
-    </main>
+    </section>
   );
+}
+
+function formatEventDate(value?: string | null): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 }

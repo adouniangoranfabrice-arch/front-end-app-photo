@@ -8,33 +8,32 @@ export default function FinalCTA() {
   const { ref, visible } = useReveal<HTMLDivElement>()
 
   return (
-    <section className="relative py-28 md:py-36 overflow-hidden" id="final-cta">
-      <div className="absolute inset-0 z-0">
-        <img src={CTA_BG} alt="Célébration" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink-950/80 via-ink-950/85 to-ink-950/95" />
-      </div>
+    <section className="px-3 pb-20 sm:px-6 md:pb-28" id="final-cta">
+      <div
+        ref={ref}
+        className={`relative mx-auto max-w-content overflow-hidden rounded-[32px] reveal ${visible ? 'visible' : ''}`}
+      >
+        <img src={CTA_BG} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/40" />
 
-      <div className="max-w-content mx-auto px-6 relative z-10">
-        <div ref={ref} className={`text-center max-w-2xl mx-auto reveal ${visible ? 'visible' : ''}`}>
-          <h2 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
-            Vos photos sont précieuses. Rendez-les faciles à retrouver.
+        <div className="relative px-7 py-16 text-white sm:px-12 md:py-24">
+          <h2 className="max-w-xl font-display text-[2rem] font-bold leading-[1.08] tracking-tight sm:text-5xl">
+            Votre prochain événement mérite mieux qu’un dossier partagé.
           </h2>
-          <p className="text-lg text-ink-300 leading-relaxed mb-9">
-            Commencez dès aujourd'hui à offrir une nouvelle expérience à vos clients et à leurs invités.
+          <p className="mt-6 max-w-lg text-base leading-relaxed text-white/75 md:text-lg">
+            Créez votre espace en deux minutes et testez Photiva sur votre prochaine prestation. C’est
+            gratuit pour commencer.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/signup"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-gold-400 to-gold-600 text-ink-950 font-semibold shadow-xl shadow-gold-500/30 transition-all hover:-translate-y-0.5 hover:shadow-gold-500/45"
-            >
-              Créer mon espace photographe →
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link to="/signup" className="btn-primary rounded-full px-7 py-3.5 text-[15px] !text-white">
+              Créer mon espace photographe
             </Link>
-            <a
-              href="#how-it-works"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-overlay/[0.06] border border-overlay/10 text-ink-100 font-semibold backdrop-blur-md transition-all hover:bg-overlay/[0.12] hover:border-overlay/20 hover:-translate-y-0.5"
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center px-4 py-3.5 text-[15px] font-semibold text-white/80 transition-colors hover:text-white"
             >
-              Découvrir la plateforme
-            </a>
+              J’ai déjà un compte
+            </Link>
           </div>
         </div>
       </div>

@@ -1,17 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
 import Hero from './components/Hero'
-import VisualDemo from './components/VisualDemo'
 import Problem from './components/Problem'
 import HowItWorks from './components/HowItWorks'
 import FacialRecognition from './components/FacialRecognition'
 import Photographers from './components/Photographers'
 import QRCode from './components/QRCode'
 import EventTypes from './components/EventTypes'
-import GuestExperience from './components/GuestExperience'
-import WhyUs from './components/WhyUs'
 import Pricing from './components/Pricing'
 import FinalCTA from './components/FinalCTA'
+import FAQ from './components/FAQ'
 import Footer from './components/Footer'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
@@ -26,16 +24,14 @@ function LandingPage() {
       <Header />
       <main>
         <Hero />
-        <VisualDemo />
         <Problem />
         <HowItWorks />
         <FacialRecognition />
         <Photographers />
         <QRCode />
         <EventTypes />
-        <GuestExperience />
-        <WhyUs />
         <Pricing />
+        <FAQ />
         <FinalCTA />
       </main>
       <Footer />

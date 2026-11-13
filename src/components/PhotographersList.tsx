@@ -84,51 +84,51 @@ export default function PhotographersList() {
 
   if (loading) {
     return (
-      <div className="p-8 text-center text-gray-500">
+      <div className="p-8 text-center text-ink-400">
         Chargement des photographes...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-ink-900/40 p-4 md:p-8">
       <div className="mx-auto max-w-full">
         <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-ink-50">
               Photographes
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-ink-400">
               Gestion des comptes photographes de Photiva
             </p>
           </div>
 
           <button
             onClick={fetchPhotographers}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+            className="rounded-lg bg-brand-500 px-4 py-2 text-white hover:bg-brand-400"
           >
             Actualiser
           </button>
         </div>
 
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Total photographes</p>
+          <div className="rounded-xl border border-overlay/[0.08] bg-ink-900/60 p-5 shadow-sm">
+            <p className="text-sm text-ink-400">Total photographes</p>
             <p className="mt-2 text-3xl font-bold">
               {photographers.length}
             </p>
           </div>
 
-          <div className="rounded-xl border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Comptes actifs</p>
-            <p className="mt-2 text-3xl font-bold text-green-600">
+          <div className="rounded-xl border border-overlay/[0.08] bg-ink-900/60 p-5 shadow-sm">
+            <p className="text-sm text-ink-400">Comptes actifs</p>
+            <p className="mt-2 text-3xl font-bold text-emerald-400">
               {photographers.filter((p) => p.is_active).length}
             </p>
           </div>
 
-          <div className="rounded-xl border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Profils vérifiés</p>
-            <p className="mt-2 text-3xl font-bold text-indigo-600">
+          <div className="rounded-xl border border-overlay/[0.08] bg-ink-900/60 p-5 shadow-sm">
+            <p className="text-sm text-ink-400">Profils vérifiés</p>
+            <p className="mt-2 text-3xl font-bold text-brand-400">
               {photographers.filter((p) => p.is_verified).length}
             </p>
           </div>
@@ -140,12 +140,12 @@ export default function PhotographersList() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher par nom, email, téléphone, ville..."
-            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+            className="w-full rounded-lg border border-overlay/[0.12] bg-ink-900/60 px-4 py-3 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
           />
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+          <div className="mb-4 rounded-lg border border-red-500/25 bg-red-500/10 p-4 text-red-400">
             {error}
             <button
               onClick={fetchPhotographers}
@@ -157,16 +157,16 @@ export default function PhotographersList() {
         )}
 
         {!error && filteredPhotographers.length === 0 ? (
-          <div className="rounded-xl border bg-white p-10 text-center text-gray-500">
+          <div className="rounded-xl border border-overlay/[0.08] bg-ink-900/60 p-10 text-center text-ink-400">
             {search
               ? "Aucun photographe ne correspond à la recherche."
               : "Aucun photographe enregistré."}
           </div>
         ) : (
           !error && (
-            <div className="overflow-x-auto rounded-xl border bg-white shadow-sm">
+            <div className="overflow-x-auto rounded-xl border border-overlay/[0.08] bg-ink-900/60 shadow-sm">
               <table className="w-full min-w-[1050px] text-left text-sm">
-                <thead className="bg-gray-100 text-gray-600">
+                <thead className="bg-ink-800/60 text-ink-300">
                   <tr>
                     <th className="px-4 py-3">Photographe</th>
                     <th className="px-4 py-3">Contact</th>
@@ -179,9 +179,9 @@ export default function PhotographersList() {
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-overlay/[0.06]">
                   {filteredPhotographers.map((p) => (
-                    <tr key={p.id} className="hover:bg-gray-50">
+                    <tr key={p.id} className="hover:bg-ink-900/40">
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
                           {p.profile_photo ? (
@@ -191,18 +191,18 @@ export default function PhotographersList() {
                               className="h-10 w-10 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 font-semibold text-indigo-700">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-500/15 font-semibold text-brand-400">
                               {(p.firstname?.[0] || "?").toUpperCase()}
                             </div>
                           )}
 
                           <div>
-                            <p className="font-semibold text-gray-900">
+                            <p className="font-semibold text-ink-50">
                               {[p.firstname, p.lastname]
                                 .filter(Boolean)
                                 .join(" ") || "Sans nom"}
                             </p>
-                            <p className="text-gray-500">
+                            <p className="text-ink-400">
                               {p.business_name || "Entreprise non renseignée"}
                             </p>
                           </div>
@@ -211,7 +211,7 @@ export default function PhotographersList() {
 
                       <td className="px-4 py-4">
                         <p>{p.email || "—"}</p>
-                        <p className="mt-1 text-gray-500">
+                        <p className="mt-1 text-ink-400">
                           {p.phone || "—"}
                         </p>
                       </td>
@@ -222,8 +222,8 @@ export default function PhotographersList() {
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                             p.is_active
-                              ? "bg-green-100 text-green-700"
-                              : "bg-red-100 text-red-700"
+                              ? "bg-emerald-500/15 text-emerald-400"
+                              : "bg-red-500/15 text-red-400"
                           }`}
                         >
                           {p.is_active ? "Actif" : "Désactivé"}
@@ -232,9 +232,9 @@ export default function PhotographersList() {
 
                       <td className="px-4 py-4">
                         {p.is_verified ? (
-                          <span className="text-green-700">Vérifié</span>
+                          <span className="text-emerald-400">Vérifié</span>
                         ) : (
-                          <span className="text-gray-500">Non vérifié</span>
+                          <span className="text-ink-400">Non vérifié</span>
                         )}
                       </td>
 
@@ -257,7 +257,7 @@ export default function PhotographersList() {
           )
         )}
 
-        <p className="mt-4 text-sm text-gray-500">
+        <p className="mt-4 text-sm text-ink-400">
           {filteredPhotographers.length} résultat(s) sur{" "}
           {photographers.length} photographe(s)
         </p>

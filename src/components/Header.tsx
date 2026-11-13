@@ -2,14 +2,13 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useScrollPosition } from '../hooks'
 import { useTheme } from '../theme'
+import Logo from './Logo'
 
 const NAV_LINKS = [
-  { label: 'Accueil', href: '/#hero' },
   { label: 'Comment ça marche', href: '/#how-it-works' },
-  { label: 'Fonctionnalités', href: '/#features' },
-  { label: 'Pour les photographes', href: '/#photographers' },
+  { label: 'Photographes', href: '/#photographers' },
   { label: 'Tarifs', href: '/#pricing' },
-  { label: 'À propos', href: '/#about' },
+  { label: 'Questions', href: '/#faq' },
 ]
 
 export default function Header() {
@@ -27,23 +26,7 @@ export default function Header() {
     >
       <div className="max-w-content mx-auto px-6 flex items-center justify-between gap-6">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 shrink-0">
-          <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 text-ink-950 shadow-lg shadow-gold-500/20">
-            <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
-              <path
-                d="M3 9.5L7 4h10l4 5.5v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinejoin="round"
-              />
-              <circle cx="12" cy="13" r="3.5" stroke="currentColor" strokeWidth="2" />
-              <path d="M8 4l1.5 2h5L16 4" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
-          </span>
-          <span className="font-display text-xl font-extrabold text-gradient-gold hidden sm:block">
-            SnapEvent
-          </span>
-        </Link>
+        <Logo compactOnMobile />
 
         {/* Desktop Nav */}
         <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center">
@@ -64,7 +47,7 @@ export default function Header() {
           <button
             onClick={toggleTheme}
             aria-label="Changer le thème"
-            className="p-2.5 rounded-xl bg-ink-800/50 border border-overlay/[0.06] text-ink-400 hover:bg-indigo-600 transition-colors"
+            className="p-2.5 rounded-xl bg-ink-800/50 border border-overlay/[0.06] text-ink-400 hover:text-brand-400 transition-colors"
           >
             {theme === 'dark' ? (
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
@@ -86,9 +69,9 @@ export default function Header() {
           </Link>
           <Link
             to="/signup"
-            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full bg-gradient-to-r from-gold-400 to-gold-600 text-ink-950 shadow-lg shadow-gold-500/25 transition-all hover:-translate-y-0.5 hover:shadow-gold-500/40"
+            className="btn-primary rounded-full px-5"
           >
-            Créer mon compte
+            Essayer gratuitement
           </Link>
         </div>
 
@@ -97,7 +80,7 @@ export default function Header() {
           <button
             onClick={toggleTheme}
             aria-label="Changer le thème"
-            className="p-2 rounded-xl text-ink-400 hover:bg-indigo-600 transition-colors"
+            className="p-2 rounded-xl text-ink-400 hover:text-brand-400 transition-colors"
           >
             {theme === 'dark' ? (
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
@@ -145,7 +128,7 @@ export default function Header() {
               <a
                 key={link.href}
                 href={link.href}
-                className="px-4 py-3.5 text-base font-medium text-ink-300 border-b border-overlay/[0.04] transition-colors hover:bg-indigo-600"
+                className="px-4 py-3.5 text-base font-medium text-ink-300 border-b border-overlay/[0.04] transition-colors hover:text-brand-400"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
@@ -161,7 +144,7 @@ export default function Header() {
               </Link>
               <Link
                 to="/signup"
-                className="w-full text-center py-3 rounded-full bg-gradient-to-r from-gold-400 to-gold-600 text-ink-950 font-semibold shadow-lg shadow-gold-500/25"
+                className="w-full text-center py-3 rounded-full bg-gradient-to-r from-brand-400 to-brand-600 text-white font-semibold shadow-lg shadow-brand-500/25"
                 onClick={() => setMenuOpen(false)}
               >
                 Créer mon compte

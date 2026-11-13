@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import api from "../../api/axios";
+import Logo from '../components/Logo'
 
 type UserRole = "ADMIN" | "PHOTOGRAPHER";
 
@@ -109,52 +110,12 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden">
 
       {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gold-500/[0.06] blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand-500/[0.06] blur-3xl pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-md">
 
         {/* Logo */}
-        <Link
-          to="/"
-          className="flex items-center justify-center gap-2.5 mb-10"
-        >
-          <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 text-ink-950 shadow-lg shadow-gold-500/20">
-
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              width="24"
-              height="24"
-            >
-              <path
-                d="M3 9.5L7 4h10l4 5.5v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinejoin="round"
-              />
-
-              <circle
-                cx="12"
-                cy="13"
-                r="3.5"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-
-              <path
-                d="M8 4l1.5 2h5L16 4"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinejoin="round"
-              />
-            </svg>
-
-          </span>
-
-          <span className="font-display text-2xl font-extrabold text-gradient-gold">
-            SnapEvent
-          </span>
-        </Link>
+        <div className="mb-10 flex justify-center"><Logo size="lg" /></div>
 
         {/* Card */}
         <div className="bg-ink-900/60 backdrop-blur-xl border border-overlay/[0.06] rounded-3xl p-8 md:p-10 shadow-2xl">
@@ -199,7 +160,7 @@ export default function Login() {
                 required
                 disabled={loading}
                 autoComplete="email"
-                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10 disabled:opacity-50"
+                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10 disabled:opacity-50"
               />
 
             </div>
@@ -227,7 +188,7 @@ export default function Login() {
                   required
                   disabled={loading}
                   autoComplete="current-password"
-                  className="w-full px-4 py-3 pr-12 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10 disabled:opacity-50"
+                  className="w-full px-4 py-3 pr-12 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10 disabled:opacity-50"
                 />
 
                 <button
@@ -292,7 +253,7 @@ export default function Login() {
 
                 <input
                   type="checkbox"
-                  className="w-4 h-4 rounded accent-gold-500"
+                  className="w-4 h-4 rounded accent-brand-500"
                 />
 
                 Se souvenir de moi
@@ -301,7 +262,7 @@ export default function Login() {
 
               <Link
                 to="/forgot-password"
-                className="text-sm bg-indigo-600 hover:text-gold-300 transition-colors"
+                className="text-sm text-brand-400 hover:text-brand-300 transition-colors"
               >
                 Mot de passe oublié ?
               </Link>
@@ -312,7 +273,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-gold-400 to-gold-600 text-ink-950 font-semibold shadow-lg shadow-gold-500/25 transition-all hover:-translate-y-0.5 hover:shadow-gold-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-400 to-brand-600 text-white font-semibold shadow-lg shadow-brand-500/25 transition-all hover:-translate-y-0.5 hover:shadow-brand-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
             >
 
               {loading
@@ -324,7 +285,7 @@ export default function Login() {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center gap-4 my-7">
+          {/* <div className="flex items-center gap-4 my-7">
 
             <div className="flex-1 h-px bg-overlay/[0.08]" />
 
@@ -334,10 +295,10 @@ export default function Login() {
 
             <div className="flex-1 h-px bg-overlay/[0.08]" />
 
-          </div>
+          </div> */}
 
-          {/* Google */}
-          <button
+          {/* Btn Google */}
+          {/* <button
             type="button"
             className="w-full py-3.5 rounded-xl bg-overlay/[0.04] border border-overlay/[0.08] text-ink-200 font-medium text-sm transition-all hover:bg-overlay/[0.08] flex items-center justify-center gap-3"
           >
@@ -370,7 +331,7 @@ export default function Login() {
 
             Continuer avec Google
 
-          </button>
+          </button> */}
 
           {/* Switch */}
           <p className="text-center text-sm text-ink-400 mt-7">
@@ -379,7 +340,7 @@ export default function Login() {
 
             <Link
               to="/signup"
-              className="bg-indigo-600 font-semibold hover:text-gold-300 transition-colors"
+              className="text-brand-400 font-semibold hover:text-brand-300 transition-colors"
             >
               Créer un compte
             </Link>

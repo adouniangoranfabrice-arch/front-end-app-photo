@@ -169,7 +169,7 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
         <div className="mb-6 p-5 rounded-2xl bg-ink-900/60 border border-overlay/[0.06]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gold-500/10 border border-gold-500/15 flex items-center justify-center bg-indigo-600">
+              <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/15 flex items-center justify-center text-brand-400">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
                   <circle cx="12" cy="11" r="3.5" stroke="currentColor" strokeWidth="1.8" />
                   <path d="M5 8a2 2 0 012-2m10 2a2 2 0 00-2-2M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -180,11 +180,11 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
                 <p className="text-xs text-ink-500">{processed.toLocaleString('fr-FR')} / {total.toLocaleString('fr-FR')} photos traitées</p>
               </div>
             </div>
-            <span className="text-sm font-bold bg-indigo-600">{progressPct}%</span>
+            <span className="text-sm font-bold text-brand-400">{progressPct}%</span>
           </div>
           <div className="h-2 rounded-full bg-ink-800 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-gold-400 to-gold-600 transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-600 transition-all duration-500"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -201,8 +201,8 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
           onClick={() => fileInputRef.current?.click()}
           className={`mb-6 h-32 rounded-2xl border-2 border-dashed cursor-pointer transition-all flex items-center justify-center ${
             dragging
-              ? 'border-gold-500 bg-gold-500/5'
-              : 'border-overlay/15 hover:border-gold-500/40 hover:bg-overlay/[0.02]'
+              ? 'border-brand-500 bg-brand-500/5'
+              : 'border-overlay/15 hover:border-brand-500/40 hover:bg-overlay/[0.02]'
           }`}
         >
           <div className="flex flex-col items-center gap-2 text-ink-500">
@@ -230,7 +230,7 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
           <div className="mb-6 flex flex-col gap-2">
             {uploadProgress.map((prog, i) => (
               <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-ink-900/60 border border-overlay/[0.06]">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" className="bg-indigo-600 shrink-0">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" className="text-brand-400 shrink-0">
                   <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.8" />
                   <circle cx="9" cy="11" r="2" stroke="currentColor" strokeWidth="1.8" />
                 </svg>
@@ -241,7 +241,7 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
                   </div>
                   <div className="h-1.5 rounded-full bg-ink-800 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-gold-400 to-gold-600 transition-all duration-200"
+                      className="h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-600 transition-all duration-200"
                       style={{ width: `${prog}%` }}
                     />
                   </div>
@@ -264,7 +264,7 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher une photo..."
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-ink-900/60 border border-overlay/[0.06] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/30"
+              className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-ink-900/60 border border-overlay/[0.06] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-brand-500/30"
             />
           </div>
 
@@ -276,7 +276,7 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
                 onClick={() => setFilter(key)}
                 className={`px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
                   filter === key
-                    ? 'bg-gold-500/10 bg-indigo-600 border border-gold-500/20'
+                    ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20'
                     : 'bg-ink-900/60 text-ink-400 border border-overlay/[0.06] hover:text-ink-100'
                 }`}
               >
@@ -308,7 +308,7 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
                         setShowSort(false)
                       }}
                       className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                        sortKey === key ? 'bg-indigo-600' : 'text-ink-300 hover:text-ink-100 hover:bg-overlay/[0.04]'
+                        sortKey === key ? 'text-brand-400' : 'text-ink-300 hover:text-ink-100 hover:bg-overlay/[0.04]'
                       }`}
                     >
                       {SORT_LABELS[key]}
@@ -322,8 +322,8 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
 
         {/* Selection bar */}
         {selected.size > 0 && (
-          <div className="mb-4 flex items-center justify-between p-3 rounded-xl bg-gold-500/10 border border-gold-500/20">
-            <span className="text-sm font-medium text-gold-300">{selected.size} sélectionnée(s)</span>
+          <div className="mb-4 flex items-center justify-between p-3 rounded-xl bg-brand-500/10 border border-brand-500/20">
+            <span className="text-sm font-medium text-brand-300">{selected.size} sélectionnée(s)</span>
             <div className="flex gap-2">
               <button
                 onClick={() => setSelected(new Set())}
@@ -351,7 +351,7 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
               key={photo.id}
               className={`group relative rounded-xl overflow-hidden bg-ink-900/60 border transition-all ${
                 selected.has(photo.id)
-                  ? 'border-gold-500/50 ring-2 ring-gold-500/20'
+                  ? 'border-brand-500/50 ring-2 ring-brand-500/20'
                   : 'border-overlay/[0.06] hover:border-overlay/15'
               }`}
             >
@@ -360,13 +360,13 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
                 onClick={() => toggleSelect(photo.id)}
                 className={`absolute top-2 left-2 z-10 w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${
                   selected.has(photo.id)
-                    ? 'bg-gold-500 border-gold-500'
+                    ? 'bg-brand-500 border-brand-500'
                     : 'bg-ink-950/60 border-overlay/30 opacity-0 group-hover:opacity-100'
                 }`}
               >
                 {selected.has(photo.id) && (
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
-                    <path d="M5 13l4 4L19 7" stroke="#0c0c0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M5 13l4 4L19 7" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </button>
@@ -396,7 +396,7 @@ export default function PhotoManagement({ onBack }: { onBack: () => void }) {
                 <p className="text-xs font-medium text-ink-200 truncate">{photo.name}</p>
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-xs text-ink-500">{photo.size}</span>
-                  <span className={`text-xs font-medium ${photo.status === 'traitée' ? 'text-emerald-400' : 'bg-indigo-600'}`}>
+                  <span className={`text-xs font-medium ${photo.status === 'traitée' ? 'text-emerald-400' : 'text-brand-400'}`}>
                     {photo.status === 'traitée' ? '✓' : '...'}
                   </span>
                 </div>

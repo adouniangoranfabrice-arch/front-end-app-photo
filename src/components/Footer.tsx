@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
+import Logo from './Logo'
 
 const COLUMNS = [
-  { title: 'Plateforme', links: ['Accueil', 'Fonctionnalités', 'Tarifs', 'Comment ça marche'] },
-  { title: 'Photographes', links: ['Créer un compte', 'Connexion', 'Dashboard', 'Aide'] },
-  { title: 'Entreprise', links: ['À propos', 'Contact', 'FAQ'] },
-  { title: 'Légal', links: ["Conditions d'utilisation", 'Politique de confidentialité', 'Protection des données'] },
+  { title: 'Produit', links: [['Comment ça marche', '/#how-it-works'], ['Pour les photographes', '/#photographers'], ['Tarifs', '/#pricing'], ['Questions fréquentes', '/#faq']] },
+  { title: 'Votre espace', links: [['Créer un compte', '/signup'], ['Se connecter', '/login'], ['Tableau de bord', '/dashboard']] },
+  { title: 'Légal', links: [["Conditions d'utilisation", '#'], ['Confidentialité', '#'], ['Données personnelles', '#']] },
 ]
 
 const SOCIALS = [
@@ -40,19 +40,10 @@ export default function Footer() {
           {/* Brand */}
           <div className="max-w-xs">
             <div className="flex items-center gap-2.5 mb-5">
-              <Link to="/" className="flex items-center gap-2.5">
-                <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-gold-400 to-gold-600 text-ink-950">
-                  <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-                    <path d="M3 9.5L7 4h10l4 5.5v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-                    <circle cx="12" cy="13" r="3.5" stroke="currentColor" strokeWidth="1.8" />
-                    <path d="M8 4l1.5 2h5L16 4" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-                  </svg>
-                </span>
-                <span className="font-display text-xl font-extrabold text-gradient-gold">SnapEvent</span>
-              </Link>
+              <Logo />
             </div>
             <p className="text-sm text-ink-400 leading-relaxed mb-6">
-              La nouvelle expérience de la photographie événementielle.
+              La galerie photo qui permet à chaque invité de retrouver ses photos en un selfie. Conçue à Abidjan, pour les photographes d'ici.
             </p>
             <div className="flex gap-3">
               {SOCIALS.map((s) => (
@@ -60,7 +51,7 @@ export default function Footer() {
                   key={s.name}
                   href="#"
                   aria-label={s.name}
-                  className="flex items-center justify-center w-10 h-10 rounded-lg bg-overlay/[0.05] border border-overlay/[0.06] text-ink-400 transition-all hover:bg-gold-500/10 hover:border-gold-500/30 hover:bg-indigo-600 hover:-translate-y-0.5"
+                  className="flex items-center justify-center w-10 h-10 rounded-lg bg-overlay/[0.05] border border-overlay/[0.06] text-ink-400 transition-all hover:bg-brand-500/10 hover:border-brand-500/30 hover:text-brand-400 hover:-translate-y-0.5"
                 >
                   {s.icon}
                 </a>
@@ -69,34 +60,22 @@ export default function Footer() {
           </div>
 
           {/* Columns */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
             {COLUMNS.map((col) => (
               <div key={col.title}>
-                <h4 className="text-xs font-bold uppercase tracking-wide text-ink-100 font-body mb-5">
+                <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-500 font-body mb-5">
                   {col.title}
                 </h4>
                 <ul className="flex flex-col gap-3">
-                  {col.links.map((link) => {
-                    const routeMap: Record<string, string> = {
-                      'Créer un compte': '/signup',
-                      'Connexion': '/login',
-                      'Dashboard': '/dashboard',
-                    }
-                    const route = routeMap[link]
-                    return (
-                      <li key={link}>
-                        {route ? (
-                          <Link to={route} className="text-sm text-ink-400 transition-colors hover:bg-indigo-600">
-                            {link}
-                          </Link>
-                        ) : (
-                          <a href="#" className="text-sm text-ink-400 transition-colors hover:bg-indigo-600">
-                            {link}
-                          </a>
-                        )}
-                      </li>
-                    )
-                  })}
+                  {col.links.map(([label, href]) => (
+                    <li key={label}>
+                      {href.startsWith('/') && !href.includes('#') ? (
+                        <Link to={href} className="text-sm text-ink-400 transition-colors hover:text-ink-50">{label}</Link>
+                      ) : (
+                        <a href={href} className="text-sm text-ink-400 transition-colors hover:text-ink-50">{label}</a>
+                      )}
+                    </li>
+                  ))}
                 </ul>
               </div>
             ))}
@@ -105,9 +84,9 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-8 border-t border-overlay/[0.06]">
-          <p className="text-sm text-ink-500">© 2026 SnapEvent. Tous droits réservés.</p>
+          <p className="text-sm text-ink-500">© 2026 Photiva. Tous droits réservés.</p>
           <p className="text-sm text-ink-500">
-            Fait avec <span className="text-red-400">❤</span> en Côte d'Ivoire 🇨🇮
+            Fait avec soin en Côte d'Ivoire
           </p>
         </div>
       </div>

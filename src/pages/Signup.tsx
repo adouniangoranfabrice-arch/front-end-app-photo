@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import Logo from '../components/Logo'
 
 export default function Signup() {
   const navigate = useNavigate()
@@ -48,20 +49,11 @@ const handleSubmit = async (e: React.FormEvent) => {
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden">
       {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gold-500/[0.06] blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand-500/[0.06] blur-3xl pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
-        <Link to="/" className="flex items-center justify-center gap-2.5 mb-10">
-          <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 text-ink-950 shadow-lg shadow-gold-500/20">
-            <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
-              <path d="M3 9.5L7 4h10l4 5.5v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-              <circle cx="12" cy="13" r="3.5" stroke="currentColor" strokeWidth="2" />
-              <path d="M8 4l1.5 2h5L16 4" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
-          </span>
-          <span className="font-display text-2xl font-extrabold text-gradient-gold">SnapEvent</span>
-        </Link>
+        <div className="mb-10 flex justify-center"><Logo size="lg" /></div>
 
         <div className="bg-ink-900/60 backdrop-blur-xl border border-overlay/[0.06] rounded-3xl p-8 md:p-10 shadow-2xl">
           <h1 className="text-2xl font-bold text-ink-50 mb-2">Créez votre espace photographe</h1>
@@ -70,27 +62,27 @@ const handleSubmit = async (e: React.FormEvent) => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {/* firstname */}
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">Nom complet</label>
+              <label className="block text-sm font-medium text-ink-300 mb-2">Nom</label>
               <input
                 type="text"
                 value={firstname}
                 onChange={(e) => setfirstname(e.target.value)}
                 placeholder="Nom"
                 required
-                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
               />
             </div>
 
             {/* firstname */}
             <div>
-              <label className="block text-sm font-medium text-ink-300 mb-2">Nom complet</label>
+              <label className="block text-sm font-medium text-ink-300 mb-2">Prénoms</label>
               <input
                 type="text"
                 value={lastname}
                 onChange={(e) => setlastname(e.target.value)}
                 placeholder="Prénoms"
                 required
-                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
               />
             </div>
 
@@ -103,7 +95,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="vous@exemple.com"
                 required
-                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                className="w-full px-4 py-3 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
               />
             </div>
 
@@ -118,7 +110,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   placeholder="••••••••"
                   required
                   minLength={6}
-                  className="w-full px-4 py-3 pr-12 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-gold-500/40 focus:ring-2 focus:ring-gold-500/10"
+                  className="w-full px-4 py-3 pr-12 rounded-xl bg-ink-800 border border-overlay/[0.08] text-ink-100 placeholder-ink-500 text-sm outline-none transition-all focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/10"
                 />
                 <button
                   type="button"
@@ -146,13 +138,13 @@ const handleSubmit = async (e: React.FormEvent) => {
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                className="w-4 h-4 mt-0.5 rounded accent-gold-500 shrink-0"
+                className="w-4 h-4 mt-0.5 rounded accent-brand-500 shrink-0"
               />
               <span>
                 J'accepte les{' '}
-                <a href="#" className="bg-indigo-600 hover:text-gold-300">Conditions d'utilisation</a>
+                <a href="#" className="text-brand-400 hover:text-brand-300">Conditions d'utilisation</a>
                 {' '}et la{' '}
-                <a href="#" className="bg-indigo-600 hover:text-gold-300">Politique de confidentialité</a>
+                <a href="#" className="text-brand-400 hover:text-brand-300">Politique de confidentialité</a>
               </span>
             </label>
 
@@ -160,7 +152,7 @@ const handleSubmit = async (e: React.FormEvent) => {
            <button
             type="submit"
             disabled={!agreed || loading}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-gold-400 to-gold-600 text-ink-950 font-semibold shadow-lg shadow-gold-500/25 transition-all hover:-translate-y-0.5 hover:shadow-gold-500/40 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-400 to-brand-600 text-white font-semibold shadow-lg shadow-brand-500/25 transition-all hover:-translate-y-0.5 hover:shadow-brand-500/40 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           >
             {loading ? "Création du compte..." : "Créer mon compte"}
           </button>
@@ -169,7 +161,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           {/* Switch */}
           <p className="text-center text-sm text-ink-400 mt-7">
             Déjà un compte ?{' '}
-            <Link to="/login" className="bg-indigo-600 font-semibold hover:text-gold-300 transition-colors">
+            <Link to="/login" className="text-brand-400 font-semibold hover:text-brand-300 transition-colors">
               Se connecter
             </Link>
           </p>

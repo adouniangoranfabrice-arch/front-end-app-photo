@@ -1,12 +1,15 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import CreateEventModal, { type CreatedEvent } from '../components/CreateEventModal'
 import PhotoManagement from '../components/PhotoManagement'
-import { useLogout } from "../utils/logout";
+import UserMenu from "../components/UserMenu";
+import ProfileView from "../components/ProfileView";
+import DashboardStats from "../components/DashboardStats";
+import { useCurrentUser } from "../utils/currentUser";
 import MyEvents from '../components/MyEvents';
+import Logo from '../components/Logo'
 
 const SIDEBAR_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: (
+  { id: 'dashboard', label: 'Tableau de bord', icon: (
     <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
       <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
       <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
@@ -20,19 +23,19 @@ const SIDEBAR_ITEMS = [
       <path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   ) },
-  { id: 'photos', label: 'Photos', icon: (
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
-      <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.8" />
-      <circle cx="9" cy="11" r="2" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M21 17l-5-5-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ) },
-  { id: 'clients', label: 'Clients', icon: (
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
-      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M4 21v-1a6 6 0 0112 0v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  ) },
+  // { id: 'photos', label: 'Photos', icon: (
+  //   <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+  //     <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.8" />
+  //     <circle cx="9" cy="11" r="2" stroke="currentColor" strokeWidth="1.8" />
+  //     <path d="M21 17l-5-5-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  //   </svg>
+  // ) },
+  // { id: 'clients', label: 'Clients', icon: (
+  //   <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+  //     <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
+  //     <path d="M4 21v-1a6 6 0 0112 0v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  //   </svg>
+  // ) },
   { id: 'stats', label: 'Statistiques', icon: (
     <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
       <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -52,32 +55,6 @@ const SIDEBAR_ITEMS = [
   ) },
 ]
 
-const STATS = [
-  { label: "Nombre d'événements", value: '12', change: '+3 ce mois', icon: (
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
-      <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  ) },
-  { label: 'Nombre de photos', value: '3 480', change: '+520 cette semaine', icon: (
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
-      <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.8" />
-      <circle cx="9" cy="11" r="2" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M21 17l-5-5-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ) },
-  { label: 'Nombre de recherches', value: '1 204', change: '+18% vs mois dernier', icon: (
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M21 21l-4.3-4.3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  ) },
-  { label: 'Nombre de téléchargements', value: '856', change: '+42 cette semaine', icon: (
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
-      <path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ) },
-]
 
 export default function Dashboard() {
   const [activeItem, setActiveItem] = useState('dashboard')
@@ -85,7 +62,7 @@ export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [view, setView] = useState<'dashboard' | 'photos'>('dashboard')
   const [eventsRefreshKey, setEventsRefreshKey] = useState(0)
-  const logout = useLogout();
+  const { user } = useCurrentUser();
 
   const handleEventCreated = (_event: CreatedEvent) => {
     setEventsRefreshKey((k) => k + 1)
@@ -121,16 +98,7 @@ export default function Dashboard() {
         }`}
       >
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 px-6 py-6 border-b border-overlay/[0.04]">
-          <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-gold-400 to-gold-600 text-ink-950">
-            <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-              <path d="M3 9.5L7 4h10l4 5.5v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-              <circle cx="12" cy="13" r="3.5" stroke="currentColor" strokeWidth="2" />
-              <path d="M8 4l1.5 2h5L16 4" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
-          </span>
-          <span className="font-display text-lg font-extrabold text-gradient-gold">SnapEvent</span>
-        </Link>
+        <div className="px-6 py-5 border-b border-overlay/[0.04]"><Logo size="sm" subtitle="Espace photographe" /></div>
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto">
@@ -140,7 +108,7 @@ export default function Dashboard() {
               onClick={() => handleSidebarClick(item.id)}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 activeItem === item.id
-                  ? 'bg-gold-500/10 bg-indigo-600 border border-gold-500/20'
+                  ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20'
                   : 'text-ink-400 hover:text-ink-100 hover:bg-overlay/[0.04] border border-transparent'
               }`}
             >
@@ -150,27 +118,11 @@ export default function Dashboard() {
           ))}
         </nav>
 
-        {/* User + logout */}
-        <div className="px-3 py-4 border-t border-overlay/[0.04]">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-ink-800/50">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-ink-950 font-bold text-sm shrink-0">
-              KP
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-ink-100 truncate">Kouassi Photo</p>
-              <p className="text-xs text-ink-500 truncate">Plan Pro</p>
-            </div>
-          </div>
-          <button
-            onClick={logout}
-            className="flex items-center gap-2 px-4 py-2.5 mt-2 text-sm text-ink-500 hover:text-red-400 transition-colors"
-          >
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Déconnexion
-          </button>
-        </div>
+        {/* Utilisateur connecté */}
+        <UserMenu
+          active={activeItem === 'profile'}
+          onOpenProfile={() => { setActiveItem('profile'); setView('dashboard'); setSidebarOpen(false) }}
+        />
       </aside>
 
       {/* Main content */}
@@ -190,7 +142,7 @@ export default function Dashboard() {
                   <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
-              <h1 className="text-lg font-bold text-ink-50 font-body">Dashboard</h1>
+              <h1 className="text-base font-semibold text-ink-50 font-body">{activeItem === 'profile' ? 'Mon profil' : 'Tableau de bord'}</h1>
             </div>
 
             <div className="flex items-center gap-3">
@@ -201,7 +153,7 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-gold-400 to-gold-600 text-ink-950 text-sm font-semibold shadow-lg shadow-gold-500/20 transition-all hover:-translate-y-0.5"
+                className="btn-primary"
               >
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
                   <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
@@ -212,33 +164,21 @@ export default function Dashboard() {
           </header>
 
           {/* Dashboard content */}
-          <main className="flex-1 p-6 overflow-y-auto">
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+            {activeItem === 'profile' ? (
+              <ProfileView />
+            ) : (
+            <>
             {/* Greeting */}
             <div className="mb-8">
               <h2 className="text-2xl md:text-3xl font-extrabold text-ink-50 font-display">
-                Bonjour, Kouassi
+                {user?.firstname ? `Bonjour, ${user.firstname}` : 'Bonjour'}
               </h2>
-              <p className="text-sm text-ink-400 mt-1">Voici un aperçu de votre activité aujourd'hui</p>
+              <p className="text-sm text-ink-400 mt-1">Voici un aperçu de votre activité sur Photiva.</p>
             </div>
 
-            {/* Stats grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-              {STATS.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="p-5 rounded-2xl bg-ink-900/60 border border-overlay/[0.06] transition-all hover:border-overlay/15"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-11 h-11 rounded-xl bg-gold-500/10 border border-gold-500/15 flex items-center justify-center bg-indigo-600">
-                      {stat.icon}
-                    </div>
-                  </div>
-                  <p className="text-3xl font-extrabold text-ink-50 font-display mb-1">{stat.value}</p>
-                  <p className="text-sm text-ink-400">{stat.label}</p>
-                  <p className="text-xs text-emerald-400 mt-2">{stat.change}</p>
-                </div>
-              ))}
-            </div>
+            {/* Statistiques réelles */}
+            <DashboardStats refreshKey={eventsRefreshKey} />
 
             {/* Recent events */}
             {/* <div>
@@ -246,7 +186,7 @@ export default function Dashboard() {
                 <h3 className="text-lg font-bold text-ink-50 font-body">Événements récents</h3>
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="text-sm bg-indigo-600 hover:text-gold-300 transition-colors font-medium"
+                  className="text-sm text-brand-400 hover:text-brand-300 transition-colors font-medium"
                 >
                   + Nouvel événement
                 </button>
@@ -256,7 +196,7 @@ export default function Dashboard() {
                 {allEvents.map((event) => (
                   <div
                     key={event.name}
-                    className="group rounded-2xl bg-ink-900/60 border border-overlay/[0.06] overflow-hidden transition-all hover:border-gold-500/30 hover:shadow-xl hover:shadow-gold-500/5"
+                    className="group rounded-2xl bg-ink-900/60 border border-overlay/[0.06] overflow-hidden transition-all hover:border-brand-500/30 hover:shadow-xl hover:shadow-brand-500/5"
                   >
                     
                     <div className="relative h-40 overflow-hidden">
@@ -305,7 +245,7 @@ export default function Dashboard() {
                           </div>
                           <div className="h-1.5 rounded-full bg-ink-800 overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-gradient-to-r from-gold-400 to-gold-600 transition-all duration-500"
+                              className="h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-600 transition-all duration-500"
                               style={{ width: `${event.progress}%` }}
                             />
                           </div>
@@ -314,7 +254,7 @@ export default function Dashboard() {
 
                       <button
                         onClick={() => { setView('photos'); setActiveItem('photos') }}
-                        className="w-full py-2.5 rounded-xl bg-overlay/[0.04] border border-overlay/[0.08] text-ink-100 text-sm font-semibold transition-all hover:bg-gold-500/10 hover:border-gold-500/30 hover:bg-indigo-600"
+                        className="w-full py-2.5 rounded-xl bg-overlay/[0.04] border border-overlay/[0.08] text-ink-100 text-sm font-semibold transition-all hover:bg-brand-500/10 hover:border-brand-500/30 hover:text-brand-400"
                       >
                         Ouvrir
                       </button>
@@ -324,6 +264,8 @@ export default function Dashboard() {
               </div>
             </div> */}
             <MyEvents key={eventsRefreshKey} />
+            </>
+            )}
            
           </main>
         </div>
